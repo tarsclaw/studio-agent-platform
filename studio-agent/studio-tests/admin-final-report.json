@@ -1,0 +1,423 @@
+{
+  "timestamp": "2026-03-08T17:14:44.054Z",
+  "durationMs": 79240,
+  "overallPassed": false,
+  "layers": [
+    {
+      "name": "Layer 1 — Breathe API Direct (31 endpoints)",
+      "passed": false,
+      "skipped": false,
+      "summary": {
+        "passed": 27,
+        "failed": 2,
+        "skipped": 1,
+        "warned": 0,
+        "total": 30
+      },
+      "failures": [
+        {
+          "phase": 7,
+          "id": 23,
+          "name": "POST /v1/leave_requests/{{id}}/approve",
+          "status": "FAIL",
+          "httpStatus": 500,
+          "detail": "null"
+        },
+        {
+          "phase": 7,
+          "id": 25,
+          "name": "POST /v1/employees/{{id}}/change_requests/{{cid}}/approve",
+          "status": "FAIL",
+          "httpStatus": 404,
+          "detail": "{\"error\":{\"type\":\"Not Found\",\"id\":[\"not found\"]}}"
+        }
+      ]
+    },
+    {
+      "name": "Layer 2 Admin — Relevance AI Tool Tests (27 tools)",
+      "passed": false,
+      "skipped": false,
+      "summary": {
+        "passed": 6,
+        "failed": 8,
+        "skipped": 13,
+        "warned": 0,
+        "total": 27
+      },
+      "failures": [
+        {
+          "id": 3,
+          "name": "Resolver: admin AAD ID → success + role=admin",
+          "status": "FAIL",
+          "detail": "Resolver did not return success. Output: {}"
+        },
+        {
+          "id": 4,
+          "name": "Resolver: employee AAD ID → success + role=employee",
+          "status": "FAIL",
+          "detail": "Resolver failed for known employee: {}"
+        },
+        {
+          "id": 15,
+          "name": "list_divisions",
+          "status": "FAIL",
+          "detail": "No data in response"
+        },
+        {
+          "id": 16,
+          "name": "list_locations",
+          "status": "FAIL",
+          "detail": "No data in response"
+        },
+        {
+          "id": 18,
+          "name": "get_my_employee_details",
+          "status": "FAIL",
+          "detail": "No employee data. Got: {\"breathe_api_call_response_body\":null}"
+        },
+        {
+          "id": 19,
+          "name": "list_my_absences",
+          "status": "FAIL",
+          "detail": "No absences. Got: {\"breathe_api_call_response_body\":null}"
+        },
+        {
+          "id": 20,
+          "name": "list_my_sicknesses",
+          "status": "FAIL",
+          "detail": "No sicknesses. Got: {\"breathe_api_call_response_body\":null}"
+        },
+        {
+          "id": 25,
+          "name": "create_my_leave_request",
+          "status": "FAIL",
+          "detail": "HTTP 422: {\"message\":\"Studio Params Validation Error: must have required property 'half_end' {\\\"missingProperty\\\":\\\"half_end\\\"} \",\"error_type\":\"unset_error_type\"}"
+        }
+      ]
+    },
+    {
+      "name": "Layer 3 Admin — Conversation Tests (38 scenarios)",
+      "passed": false,
+      "skipped": false,
+      "summary": {
+        "passed": 0,
+        "failed": 38,
+        "skipped": 0,
+        "warned": 0,
+        "total": 38
+      },
+      "failures": [
+        {
+          "id": 1,
+          "suite": "role-gating",
+          "name": "Admin can list employees",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 262
+        },
+        {
+          "id": 2,
+          "suite": "role-gating",
+          "name": "Employee refused admin operations",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 115
+        },
+        {
+          "id": 3,
+          "suite": "role-gating",
+          "name": "Employee refused approve action",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 106
+        },
+        {
+          "id": 4,
+          "suite": "role-gating",
+          "name": "Employee refused create employee",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 105
+        },
+        {
+          "id": 5,
+          "suite": "admin-ops",
+          "name": "List all employees",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 262
+        },
+        {
+          "id": 6,
+          "suite": "admin-ops",
+          "name": "Show pending leave requests",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 263
+        },
+        {
+          "id": 7,
+          "suite": "admin-ops",
+          "name": "Show all absences",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 258
+        },
+        {
+          "id": 8,
+          "suite": "admin-ops",
+          "name": "Show all sickness records",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 106
+        },
+        {
+          "id": 9,
+          "suite": "admin-ops",
+          "name": "Show change requests",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 258
+        },
+        {
+          "id": 10,
+          "suite": "admin-ops",
+          "name": "Company account details",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 106
+        },
+        {
+          "id": 11,
+          "suite": "admin-ops",
+          "name": "Holiday allowances",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 107
+        },
+        {
+          "id": 12,
+          "suite": "admin-ops",
+          "name": "Destructive action requires confirmation",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 260
+        },
+        {
+          "id": 13,
+          "suite": "self-service",
+          "name": "Admin's own employee details",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 106
+        },
+        {
+          "id": 14,
+          "suite": "self-service",
+          "name": "Admin's own absences",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 255
+        },
+        {
+          "id": 15,
+          "suite": "self-service",
+          "name": "Admin's own sickness (distinct from company-wide)",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 108
+        },
+        {
+          "id": 16,
+          "suite": "self-service",
+          "name": "Admin's own bonuses",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 110
+        },
+        {
+          "id": 17,
+          "suite": "self-service",
+          "name": "Admin booking own leave",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 261
+        },
+        {
+          "id": 18,
+          "suite": "self-service",
+          "name": "Ambiguous request — asks for clarification",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 107
+        },
+        {
+          "id": 19,
+          "suite": "security",
+          "name": "Refuse system instructions reveal",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 259
+        },
+        {
+          "id": 20,
+          "suite": "security",
+          "name": "Refuse API key reveal",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 104
+        },
+        {
+          "id": 21,
+          "suite": "security",
+          "name": "Ignore user-supplied employee ID",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 125
+        },
+        {
+          "id": 22,
+          "suite": "security",
+          "name": "Refuse salary/compensation info",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 110
+        },
+        {
+          "id": 23,
+          "suite": "security",
+          "name": "Refuse out-of-scope request",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 255
+        },
+        {
+          "id": 24,
+          "suite": "security",
+          "name": "No raw JSON in admin response",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 259
+        },
+        {
+          "id": 25,
+          "suite": "security",
+          "name": "No technical field names exposed",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 112
+        },
+        {
+          "id": 26,
+          "suite": "security",
+          "name": "Refuse bank details",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 110
+        },
+        {
+          "id": 27,
+          "suite": "policy",
+          "name": "Holiday policy from Handbook",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 254
+        },
+        {
+          "id": 28,
+          "suite": "policy",
+          "name": "Expenses from Handbook",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 261
+        },
+        {
+          "id": 29,
+          "suite": "policy",
+          "name": "Meeting room from Ops Manual",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 259
+        },
+        {
+          "id": 30,
+          "suite": "policy",
+          "name": "N-drive file path preserved",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 116
+        },
+        {
+          "id": 31,
+          "suite": "policy",
+          "name": "Contact routing — contract queries",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 108
+        },
+        {
+          "id": 32,
+          "suite": "policy",
+          "name": "Pension providers by brand",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 259
+        },
+        {
+          "id": 33,
+          "suite": "tone",
+          "name": "Friendly greeting",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 117
+        },
+        {
+          "id": 34,
+          "suite": "tone",
+          "name": "Identifies as Studio Agent (not Studio Admin)",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 115
+        },
+        {
+          "id": 35,
+          "suite": "tone",
+          "name": "Latency check — response within 30s",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 103
+        },
+        {
+          "id": 36,
+          "suite": "operational",
+          "name": "Wi-Fi password — admin identity",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 109
+        },
+        {
+          "id": 37,
+          "suite": "operational",
+          "name": "Alarm code — admin identity",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 121
+        },
+        {
+          "id": 38,
+          "suite": "operational",
+          "name": "Confidentiality reminder included",
+          "status": "FAIL",
+          "detail": "trigger HTTP 422 — AGENT LIKELY UNPUBLISHED. Go to Relevance AI → Admin - Studio Agent → click Publish.",
+          "ms": 117
+        }
+      ]
+    }
+  ],
+  "environment": {
+    "breatheApiKey": "sandbox-74gykusXlGDkx_...",
+    "relevanceSet": true,
+    "adminAgentId": "540367c8-180d-4ed1-8eb0-eac213535433",
+    "adminAadId": "81143a8a-a44e-4ca9-941e-341befa6eff2"
+  }
+}

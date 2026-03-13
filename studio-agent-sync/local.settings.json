@@ -1,0 +1,25 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+
+    "AZURE_TENANT_ID": "71418a92-c160-4b5d-8908-634d844e3bdf",
+    "AZURE_CLIENT_ID": "70aa02ea-a386-47c2-90c2-1fbf0537b427",
+    "AZURE_CLIENT_SECRET": "9Ne8Q~TtZHb22JGtn4Swl5NSQTYD~0~RKEdt4agK",
+
+    "BREATHE_API_KEY": "sandbox-74gykusXlGDkx_TK7OEEcyCa4Rivsbkxh8ywF8cBk3M",
+    "BREATHE_BASE_URL": "https://api.sandbox.breathehr.info/v1",
+
+    "RELEVANCE_API_KEY": "sk-ZTRlZDZlZmQtYzRjYS00NDMyLWFmYjAtYjdkOGM3ODAwOTBk",
+    "RELEVANCE_PROJECT_ID": "ca7f193a-f48c-41ab-8c3e-6833ec9a5001",
+    "RELEVANCE_REGION": "bcbe5a",
+    "RELEVANCE_DATASET_ID": "resolver_knowledge_table_with_status_csv",
+
+    "ADMIN_AAD_OBJECT_IDS": "81143a8a-a44e-4ca9-941e-341befa6eff2",
+
+    "BOT_APP_ID": "",
+    "BOT_APP_PASSWORD": "",
+    "BOT_SERVICE_URL": "https://smba.trafficmanager.net/uk/"
+  }
+}

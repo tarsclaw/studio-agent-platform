@@ -1,0 +1,12 @@
+﻿node_modules/
+lib/
+.localConfigs
+.localConfigs.playground
+.env.local.user
+env/.env.*.user
+*.env
+.env
+.env.test
+.DS_Store
+.vs/
+*.txt

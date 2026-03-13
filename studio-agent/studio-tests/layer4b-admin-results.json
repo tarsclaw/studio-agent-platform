@@ -1,0 +1,126 @@
+{
+  "timestamp": "2026-03-09T23:54:18.772Z",
+  "layer": "4b-admin-tools",
+  "discoveredIds": {
+    "employeeId": "9811",
+    "secondEmployeeId": "12661",
+    "leaveRequestId": "7564",
+    "absenceId": "112",
+    "changeRequestId": "22"
+  },
+  "results": [
+    {
+      "id": 1,
+      "phase": 1,
+      "name": "Discover employee IDs",
+      "status": "PASS",
+      "detail": "primary=9811, second=12661, total=5"
+    },
+    {
+      "id": 2,
+      "phase": 1,
+      "name": "Discover leave request IDs",
+      "status": "PASS",
+      "detail": "leaveRequestId=7564 (13 total)"
+    },
+    {
+      "id": 3,
+      "phase": 1,
+      "name": "Discover absence IDs",
+      "status": "PASS",
+      "detail": "absenceId=112 (1 total)"
+    },
+    {
+      "id": 4,
+      "phase": 1,
+      "name": "Discover change request IDs",
+      "status": "PASS",
+      "detail": "changeRequestId=22 (5 total)"
+    },
+    {
+      "id": 10,
+      "phase": 2,
+      "name": "Get Employee Details (Admin)",
+      "status": "PASS",
+      "detail": "Breathe returned real data (1986 chars)"
+    },
+    {
+      "id": 11,
+      "phase": 2,
+      "name": "List Employee Bonuses (Admin)",
+      "status": "PASS",
+      "detail": "Breathe returned real data (14 chars)"
+    },
+    {
+      "id": 12,
+      "phase": 2,
+      "name": "Create Leave Request (Admin) — dry run params",
+      "status": "FAIL",
+      "detail": "HTTP 422"
+    },
+    {
+      "id": 13,
+      "phase": 2,
+      "name": "Create Employee Change Request (Admin) — dry run",
+      "status": "FAIL",
+      "detail": "HTTP 422"
+    },
+    {
+      "id": 14,
+      "phase": 2,
+      "name": "Get Leave Request (Admin)",
+      "status": "PASS",
+      "detail": "Breathe returned real data (468 chars)"
+    },
+    {
+      "id": 17,
+      "phase": 2,
+      "name": "Cancel Absence — param check (won't execute if already cancelled)",
+      "status": "FAIL",
+      "detail": "breathe_api_call_response_body is NULL — variable not substituting into path"
+    },
+    {
+      "id": 30,
+      "phase": 3,
+      "name": "Admin: get employee details for specific employee",
+      "status": "PASS"
+    },
+    {
+      "id": 31,
+      "phase": 3,
+      "name": "Admin: list bonuses for specific employee",
+      "status": "PASS"
+    },
+    {
+      "id": 32,
+      "phase": 3,
+      "name": "Self-service: my employee details (resolver chain)",
+      "status": "PASS"
+    },
+    {
+      "id": 33,
+      "phase": 3,
+      "name": "Self-service: my absences (resolver chain)",
+      "status": "PASS"
+    },
+    {
+      "id": 34,
+      "phase": 3,
+      "name": "Self-service: my sickness records (resolver chain)",
+      "status": "PASS"
+    },
+    {
+      "id": 35,
+      "phase": 3,
+      "name": "Self-service: my bonuses (resolver chain)",
+      "status": "PASS"
+    },
+    {
+      "id": 36,
+      "phase": 3,
+      "name": "Admin: get leave request 7564",
+      "status": "PASS"
+    }
+  ],
+  "diagnosis": "BROKEN"
+}

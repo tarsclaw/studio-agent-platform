@@ -1,0 +1,257 @@
+{
+  "timestamp": "2026-03-08T17:13:28.533Z",
+  "layer": 1,
+  "summary": {
+    "passed": 27,
+    "failed": 2,
+    "skipped": 1,
+    "warned": 0,
+    "total": 30
+  },
+  "discoveredIds": {
+    "breathe_employee_id": 9811,
+    "leave_request_id": 7564,
+    "absence_id": 112,
+    "change_request_id": 18
+  },
+  "results": [
+    {
+      "phase": 1,
+      "id": 1,
+      "name": "GET /v1/account  →  auth + account details",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 69
+    },
+    {
+      "phase": 2,
+      "id": 2,
+      "name": "GET /v1/departments",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 68
+    },
+    {
+      "phase": 2,
+      "id": 3,
+      "name": "GET /v1/divisions",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 73
+    },
+    {
+      "phase": 2,
+      "id": 4,
+      "name": "GET /v1/locations",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 62
+    },
+    {
+      "phase": 2,
+      "id": 5,
+      "name": "GET /v1/working_patterns",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 129
+    },
+    {
+      "phase": 2,
+      "id": 6,
+      "name": "GET /v1/holiday_allowances",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 63
+    },
+    {
+      "phase": 2,
+      "id": 7,
+      "name": "GET /v1/bonuses  (org-wide)",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 65
+    },
+    {
+      "phase": 3,
+      "id": 9,
+      "name": "GET /v1/leave_requests  →  harvest leaveRequestId",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 82
+    },
+    {
+      "phase": 3,
+      "id": 10,
+      "name": "GET /v1/absences  →  harvest absenceId",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 66
+    },
+    {
+      "phase": 3,
+      "id": 11,
+      "name": "GET /v1/change_requests  →  harvest changeId",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 72
+    },
+    {
+      "phase": 4,
+      "id": 12,
+      "name": "GET /v1/employees/{{breathe_employee_id}}",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 88
+    },
+    {
+      "phase": 4,
+      "id": 13,
+      "name": "GET /v1/absences?employee_id={{breathe_employee_id}}",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 80
+    },
+    {
+      "phase": 4,
+      "id": 14,
+      "name": "GET /v1/employees/{{breathe_employee_id}}/bonuses",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 77
+    },
+    {
+      "phase": 4,
+      "id": 15,
+      "name": "GET /v1/employees/{{breathe_employee_id}}/sicknesses",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 60
+    },
+    {
+      "phase": 5,
+      "id": 16,
+      "name": "GET /v1/employees/{{employee_id}}  (admin get)",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 91
+    },
+    {
+      "phase": 5,
+      "id": 17,
+      "name": "GET /v1/employees/{{employee_id}}/bonuses  (admin)",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 58
+    },
+    {
+      "phase": 5,
+      "id": 18,
+      "name": "GET /v1/leave_requests/{{leave_request_id}}",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 69
+    },
+    {
+      "phase": 6,
+      "id": 19,
+      "name": "POST /v1/employees  →  Create Employee",
+      "status": "PASS",
+      "httpStatus": 201,
+      "ms": 370
+    },
+    {
+      "phase": 6,
+      "id": 20,
+      "name": "POST /v1/employees/{{breathe_employee_id}}/leave_requests  (self-service)",
+      "status": "PASS",
+      "httpStatus": 201,
+      "ms": 90
+    },
+    {
+      "phase": 6,
+      "id": 21,
+      "name": "POST /v1/employees/{{employee_id}}/leave_requests  (admin)",
+      "status": "PASS",
+      "httpStatus": 201,
+      "ms": 199
+    },
+    {
+      "phase": 6,
+      "id": 22,
+      "name": "POST /v1/employees/{{employee_id}}/change_requests",
+      "status": "PASS",
+      "httpStatus": 201,
+      "ms": 95
+    },
+    {
+      "phase": 7,
+      "id": 23,
+      "name": "POST /v1/leave_requests/{{id}}/approve",
+      "status": "FAIL",
+      "httpStatus": 500,
+      "detail": "null"
+    },
+    {
+      "phase": 7,
+      "id": 24,
+      "name": "POST /v1/leave_requests/{{id}}/reject",
+      "status": "SKIP"
+    },
+    {
+      "phase": 7,
+      "id": 25,
+      "name": "POST /v1/employees/{{id}}/change_requests/{{cid}}/approve",
+      "status": "FAIL",
+      "httpStatus": 404,
+      "detail": "{\"error\":{\"type\":\"Not Found\",\"id\":[\"not found\"]}}"
+    },
+    {
+      "phase": 7,
+      "id": 26,
+      "name": "POST /v1/absences/{{id}}/cancel",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 93
+    },
+    {
+      "phase": 8,
+      "id": 27,
+      "name": "GET /v1/leave_requests  (post approve/reject)",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 82
+    },
+    {
+      "phase": 8,
+      "id": 28,
+      "name": "GET /v1/change_requests  (post approve)",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 75
+    },
+    {
+      "phase": 8,
+      "id": 29,
+      "name": "GET /v1/absences  (post cancel)",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 71
+    },
+    {
+      "phase": 8,
+      "id": 30,
+      "name": "GET /v1/employees",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 144
+    },
+    {
+      "phase": 8,
+      "id": 31,
+      "name": "GET /v1/account  (final auth confirm)",
+      "status": "PASS",
+      "httpStatus": 200,
+      "ms": 63
+    }
+  ]
+}

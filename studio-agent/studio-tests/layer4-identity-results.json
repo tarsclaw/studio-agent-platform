@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-03-09T21:52:04.373Z",
+  "layer": "4-identity-flow",
+  "admin_identity": {
+    "TENANT_ID": "allect",
+    "AAD_OBJECT_ID": "81143a8a-a44e-4ca9-941e-341befa6eff2",
+    "EXPECTED_BREATHE_ID": "9811",
+    "NAME": "Maddox Rigby"
+  },
+  "results": [
+    {
+      "id": 1,
+      "phase": 1,
+      "name": "Resolver returns breathe_employee_id",
+      "status": "PASS",
+      "detail": "ID=9811, name=Maddox Rigby, role=admin"
+    },
+    {
+      "id": 2,
+      "phase": 1,
+      "name": "Resolver ID matches expected",
+      "status": "PASS",
+      "detail": "9811 === 9811"
+    },
+    {
+      "id": 3,
+      "phase": 1,
+      "name": "Unknown AAD Object ID → NOT_LINKED",
+      "status": "PASS",
+      "detail": "correctly refused"
+    },
+    {
+      "id": 4,
+      "phase": 2,
+      "name": "Get My Employee Details → param: breathe_employee_id",
+      "status": "PASS",
+      "detail": "Breathe HR data returned"
+    },
+    {
+      "id": 8,
+      "phase": 2,
+      "name": "List My Absences → param: breathe_employee_id",
+      "status": "PASS",
+      "detail": "Breathe HR data returned"
+    },
+    {
+      "id": 12,
+      "phase": 2,
+      "name": "List My Sicknesses → param: breathe_employee_id",
+      "status": "PASS",
+      "detail": "Breathe HR data returned"
+    },
+    {
+      "id": 16,
+      "phase": 2,
+      "name": "List My Bonuses (CONTROL — known working) → param: breathe_employee_id",
+      "status": "PASS",
+      "detail": "Breathe HR data returned"
+    },
+    {
+      "id": 20,
+      "phase": 3,
+      "name": "My employee details → must return real data",
+      "status": "PASS",
+      "detail": "personalised data"
+    },
+    {
+      "id": 21,
+      "phase": 3,
+      "name": "My absences → must return data or 'no absences'",
+      "status": "PASS",
+      "detail": "personalised data"
+    },
+    {
+      "id": 22,
+      "phase": 3,
+      "name": "My sickness records → must return data or 'no records'",
+      "status": "PASS",
+      "detail": "personalised data"
+    },
+    {
+      "id": 23,
+      "phase": 3,
+      "name": "My bonuses (CONTROL) → must return data or 'no bonuses'",
+      "status": "PASS",
+      "detail": "personalised data"
+    },
+    {
+      "id": 24,
+      "phase": 3,
+      "name": "Book leave → must enter booking flow",
+      "status": "PASS",
+      "detail": "personalised data"
+    }
+  ],
+  "diagnosis": "HEALTHY",
+  "brokenTools": []
+}

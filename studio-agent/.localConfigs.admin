@@ -1,0 +1,34 @@
+# ============================================================
+#  Studio Admin — Environment Variables
+#  Copy this file to your project root as .localConfigs.admin
+#  Fill in the <PLACEHOLDER> values before running.
+# ============================================================
+
+# ── Relevance AI (Admin Agent) ──────────────────────────────
+# Create the admin agent in Relevance AI first, then paste its ID here.
+RELEVANCE_AGENT_ID=540367c8-180d-4ed1-8eb0-eac213535433
+RELEVANCE_API_KEY=sk-ZTRlZDZlZmQtYzRjYS00NDMyLWFmYjAtYjdkOGM3ODAwOTBk
+RELEVANCE_PROJECT_ID=ca7f193a-f48c-41ab-8c3e-6833ec9a5001
+RELEVANCE_REGION=US
+
+# ── Agent Type (drives telemetry tagging) ───────────────────
+AGENT_TYPE=admin
+
+# ── Azure Bot Registration (Admin) ──────────────────────────
+# Create a SECOND Azure Bot resource in Azure Portal.
+# This must be different from the employee bot's BOT_ID.
+BOT_ID=<ADMIN_BOT_ID_FROM_AZURE>
+SECRET_BOT_PASSWORD=<ADMIN_BOT_PASSWORD_FROM_AZURE>
+
+# ── Teams App ID (Admin) ────────────────────────────────────
+# Auto-generated during provisioning, or set manually.
+TEAMS_APP_ID_ADMIN=<AUTO_GENERATED_OR_MANUAL_GUID>
+
+# ── Telemetry (same as employee bot) ────────────────────────
+# These are shared — both bots write to the same pipeline.
+# The agent_type field in the envelope distinguishes them.
+TELEMETRY_QUEUE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=rgstudioagenttelemetry01;AccountKey=zinjJXcp2YO/GDl+873X6GWNN02uiH+AIcXHC1JX/DROXN1PAkZHX8qGyDUZQ44M61F8K08js2w/+AStjARQTw==;EndpointSuffix=core.windows.net
+TELEMETRY_QUEUE_NAME=bot-telemetry
+
+# ── App Insights (same as employee bot) ─────────────────────
+APPLICATIONINSIGHTS_CONNECTION_STRING=<YOUR_EXISTING_APP_INSIGHTS_CONNECTION_STRING>

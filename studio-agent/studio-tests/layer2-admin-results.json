@@ -1,0 +1,205 @@
+{
+  "timestamp": "2026-03-08T21:41:40.711Z",
+  "layer": "2-admin",
+  "agentId": "540367c8-180d-4ed1-8eb0-eac213535433",
+  "discoveredTools": {
+    "approve_leave_request_(admin)_": "13cafa91-d591-41c0-955e-a12d2deda8c6",
+    "get_my_employee_details": "60f26c1b-d02f-41b0-9488-f1ed06ccf226",
+    "list_working_patterns": "a9c23bdf-3ac8-4167-9b4f-43dacdf93b11",
+    "list_my_sicknesses": "b5237b9b-437e-4f4b-b3d6-650e1cfca600",
+    "resolver_tool": "897c3b0e-ceaf-4bb6-8d93-fc2479243f14",
+    "list_my_absences": "a16998c9-871d-47ba-8448-6bbdf7c59b90",
+    "list_employee_bonuses_(admin)": "572c0580-3dad-4089-85b7-4b584c1ccf24",
+    "reject_leave_request_(admin)_": "a9420ab8-d263-464b-9686-6f9b34639873",
+    "get_leave_request_(admin)_": "5ba48db6-beca-4cba-a52f-f4833aa28a77",
+    "create_employee_change_request_(admin)": "90670946-976e-4390-8686-06a5f5902705",
+    "get_employee_details_(admin)": "08459149-06bd-442b-862e-ac53fcaad9b3",
+    "list_change_requests_(admin)": "777dc42a-7de8-464c-9ff6-0334247a78f0",
+    "list_absences_(admin)": "b2f3ab48-c9b4-40dd-a646-8db155ce4719",
+    "list_divisions": "078d22ff-1422-4949-a7cf-aee64ece1c43",
+    "get_company_account_details_(admin)_": "9544cd20-458a-46f6-bbaa-a55d39db7d14",
+    "reject_leave_request": "b7e507fc-0848-4b4f-b77d-972e4c6668d9",
+    "list_locations": "57f6eb31-e4ed-45d6-8a92-b4c6c3b97e31",
+    "list_sicknesses_(admin)": "d5257fc0-15a0-4f51-9f69-0a89be743754",
+    "list_all_bonuses_(admin)_": "e035a603-e452-4009-a6f3-c917e904475f",
+    "list_leave_requests_(admin)": "2c047225-1c06-4260-84c3-adc1e7a03d28",
+    "list_employees(admin)": "54c5220e-22dd-4b8b-81c9-56c0fe0bdceb",
+    "create_employee": "70b36f77-7d79-487a-9f16-222a98026baf",
+    "approve_change_request(admin)": "2d7afb5d-8c3a-42e0-a710-ab384f3c0af2",
+    "create_leave_request_(admin)": "6a6ca15b-15f0-4412-baa8-ded63f9f6b88",
+    "cancel_absence": "c9b23140-d895-4fd5-83a8-a3ca798d5b47",
+    "list_my_bonuses": "fd6cce9f-fabd-4552-9892-d648a116ffb6",
+    "list_departments": "7ad7d7fa-668e-4788-9418-bf38e854cd18",
+    "create_my_leave_request": "8a3a8e14-dd2c-46cd-8293-974f12bf204c"
+  },
+  "summary": {
+    "passed": 24,
+    "failed": 2,
+    "skipped": 1,
+    "warned": 0,
+    "total": 27
+  },
+  "results": [
+    {
+      "id": 1,
+      "name": "POST agents/list (auth check)",
+      "status": "PASS",
+      "ms": 575
+    },
+    {
+      "id": 2,
+      "name": "Discover admin agent tools",
+      "status": "PASS",
+      "ms": 403
+    },
+    {
+      "id": 3,
+      "name": "Resolver: admin AAD ID -> success + role=admin",
+      "status": "PASS",
+      "ms": 6234
+    },
+    {
+      "id": 4,
+      "name": "Resolver: employee AAD ID -> success + role=employee",
+      "status": "PASS",
+      "ms": 5717
+    },
+    {
+      "id": 5,
+      "name": "Resolver: unknown AAD ID -> NOT_LINKED",
+      "status": "PASS",
+      "ms": 6354
+    },
+    {
+      "id": 6,
+      "name": "list_employees",
+      "status": "PASS",
+      "ms": 12566
+    },
+    {
+      "id": 7,
+      "name": "list_leave_requests",
+      "status": "PASS",
+      "ms": 5866
+    },
+    {
+      "id": 8,
+      "name": "list_change_requests",
+      "status": "PASS",
+      "ms": 9791
+    },
+    {
+      "id": 9,
+      "name": "list_absences",
+      "status": "PASS",
+      "ms": 5643
+    },
+    {
+      "id": 10,
+      "name": "list_sicknesses",
+      "status": "FAIL",
+      "detail": "No data. Got: {}"
+    },
+    {
+      "id": 11,
+      "name": "list_all_bonuses",
+      "status": "PASS",
+      "ms": 5878
+    },
+    {
+      "id": 12,
+      "name": "get_company_account_details",
+      "status": "PASS",
+      "ms": 6274
+    },
+    {
+      "id": 13,
+      "name": "list_holiday_allowances",
+      "status": "SKIP"
+    },
+    {
+      "id": 14,
+      "name": "list_departments",
+      "status": "PASS",
+      "ms": 6253
+    },
+    {
+      "id": 15,
+      "name": "list_divisions",
+      "status": "PASS",
+      "ms": 5368
+    },
+    {
+      "id": 16,
+      "name": "list_locations",
+      "status": "PASS",
+      "ms": 5577
+    },
+    {
+      "id": 17,
+      "name": "list_working_patterns",
+      "status": "PASS",
+      "ms": 7152
+    },
+    {
+      "id": 18,
+      "name": "get_my_employee_details",
+      "status": "PASS",
+      "ms": 5773
+    },
+    {
+      "id": 19,
+      "name": "list_my_absences",
+      "status": "PASS",
+      "ms": 5595
+    },
+    {
+      "id": 20,
+      "name": "list_my_sicknesses",
+      "status": "PASS",
+      "ms": 6526
+    },
+    {
+      "id": 21,
+      "name": "list_my_bonuses",
+      "status": "PASS",
+      "ms": 6428
+    },
+    {
+      "id": 22,
+      "name": "get_employee_details",
+      "status": "PASS",
+      "ms": 6603
+    },
+    {
+      "id": 23,
+      "name": "list_employee_bonuses",
+      "status": "PASS",
+      "ms": 7391
+    },
+    {
+      "id": 24,
+      "name": "get_leave_request",
+      "status": "PASS",
+      "ms": 12701
+    },
+    {
+      "id": 25,
+      "name": "create_my_leave_request",
+      "status": "PASS",
+      "ms": 1445
+    },
+    {
+      "id": 26,
+      "name": "create_leave_request",
+      "status": "FAIL",
+      "detail": "No data. Got: {}"
+    },
+    {
+      "id": 27,
+      "name": "create_employee_change_request",
+      "status": "PASS",
+      "ms": 6797
+    }
+  ]
+}

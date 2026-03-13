@@ -1,0 +1,53 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.24/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.24",
+  "version": "1.0.0",
+  "id": "${{TEAMS_APP_ID_ADMIN}}",
+
+  "defaultInstallScope": "personal",
+
+  "developer": {
+    "name": "Allect Design Group",
+    "websiteUrl": "https://www.allect.com",
+    "privacyUrl": "https://www.allect.com/privacy",
+    "termsOfUseUrl": "https://www.allect.com/terms"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Studio Admin${{APP_NAME_SUFFIX}}",
+    "full": "Studio Admin — HR Management Bot for Allect Design Group"
+  },
+  "description": {
+    "short": "Admin HR management for Allect Design Group — approve leave, manage employees, run reports.",
+    "full": "Studio Admin is the management companion to Studio Agent. It gives authorised administrators the ability to approve and reject leave requests, manage employee records, view company-wide HR data, create change requests, and run reports — all from within Microsoft Teams. Built for Rigby & Rigby, Helen Green Design, and Lawson Robb."
+  },
+  "accentColor": "#1B2A4A",
+  "bots": [
+    {
+      "botId": "${{BOT_ID_ADMIN}}",
+      "scopes": ["personal"],
+      "supportsFiles": false,
+      "isNotificationOnly": false,
+      "commandLists": [
+        {
+          "scopes": ["personal"],
+          "commands": [
+            { "title": "Hi", "description": "Say hi to Studio Admin." },
+            { "title": "Pending leave", "description": "Show pending leave requests." },
+            { "title": "List employees", "description": "List all employees." },
+            { "title": "Pending changes", "description": "Show pending change requests." },
+            { "title": "/reset", "description": "Reset conversation state." }
+          ]
+        }
+      ]
+    }
+  ],
+  "composeExtensions": [],
+  "configurableTabs": [],
+  "staticTabs": [],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["${{BOT_DOMAIN_ADMIN}}"]
+}

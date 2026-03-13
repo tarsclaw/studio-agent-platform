@@ -1,0 +1,26 @@
+{
+  "name": "studio-agent-sync",
+  "version": "1.0.0",
+  "description": "Auto-sync engine: Breathe HR ↔ Azure AD ↔ Relevance AI identity mapping",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rimraf dist",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "echo \"TODO: sync engine tests\" && exit 0"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.11.0",
+    "@azure/identity": "^4.11.1",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "isomorphic-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "azure-functions-core-tools": "^4.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "~5.8.3"
+  }
+}

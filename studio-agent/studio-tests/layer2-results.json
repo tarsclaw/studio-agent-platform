@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-03-07T10:56:12.272Z",
+  "layer": 2,
+  "discoveredTools": {
+    "get_my_employee_details": "60f26c1b-d02f-41b0-9488-f1ed06ccf226",
+    "list_my_absences": "a16998c9-871d-47ba-8448-6bbdf7c59b90",
+    "list_departments": "7ad7d7fa-668e-4788-9418-bf38e854cd18",
+    "create_my_leave_request": "8a3a8e14-dd2c-46cd-8293-974f12bf204c",
+    "list_my_bonuses": "fd6cce9f-fabd-4552-9892-d648a116ffb6",
+    "list_my_sicknesses": "b5237b9b-437e-4f4b-b3d6-650e1cfca600",
+    "list_working_patterns": "a9c23bdf-3ac8-4167-9b4f-43dacdf93b11",
+    "resolver_tool": "897c3b0e-ceaf-4bb6-8d93-fc2479243f14"
+  },
+  "summary": {
+    "passed": 11,
+    "failed": 0,
+    "skipped": 2,
+    "warned": 0,
+    "total": 13
+  },
+  "results": [
+    {
+      "id": 1,
+      "name": "POST agents/list (auth check)",
+      "status": "PASS"
+    },
+    {
+      "id": 2,
+      "name": "List agents (discover tools via actions[])",
+      "status": "PASS",
+      "ms": 260
+    },
+    {
+      "id": 3,
+      "name": "get_my_employee_details",
+      "status": "PASS",
+      "ms": 7545
+    },
+    {
+      "id": 4,
+      "name": "list_my_absences",
+      "status": "PASS",
+      "ms": 6604
+    },
+    {
+      "id": 5,
+      "name": "list_my_bonuses",
+      "status": "PASS",
+      "ms": 4937
+    },
+    {
+      "id": 6,
+      "name": "list_my_sicknesses",
+      "status": "PASS",
+      "ms": 5748
+    },
+    {
+      "id": 7,
+      "name": "create_my_leave_request",
+      "status": "PASS",
+      "ms": 5704
+    },
+    {
+      "id": 8,
+      "name": "list_departments",
+      "status": "PASS",
+      "ms": 5979
+    },
+    {
+      "id": 9,
+      "name": "list_divisions",
+      "status": "SKIP"
+    },
+    {
+      "id": 10,
+      "name": "list_locations",
+      "status": "SKIP"
+    },
+    {
+      "id": 11,
+      "name": "list_working_patterns",
+      "status": "PASS",
+      "ms": 5719
+    },
+    {
+      "id": 12,
+      "name": "Resolver: resolve_employee_id with real AAD Object ID",
+      "status": "PASS",
+      "ms": 5512
+    },
+    {
+      "id": 13,
+      "name": "Resolver: unknown AAD Object ID → NOT_LINKED (security check)",
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "studio-agent-tests",
+  "version": "2.0.0",
+  "description": "Studio Agent complete test suite — Breathe HR + Relevance AI + Teams E2E",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test":         "node studio-tests/run.js",
+    "test:seed":    "node studio-tests/run.js --only seed",
+    "test:layer1":  "node studio-tests/run.js --only layer1",
+    "test:layer2":  "node studio-tests/run.js --only layer2",
+    "test:layer3":  "node studio-tests/run.js --only layer3",
+    "test:report":  "node studio-tests/run.js --report",
+    "seed":         "node studio-tests/seed.js",
+    "seed:check":   "node studio-tests/seed.js --check",
+    "seed:reset":   "node studio-tests/seed.js --reset"
+  }
+}
