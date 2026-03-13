@@ -15,7 +15,7 @@
  *   The UI handles both states gracefully rather than crashing.
  */
 
-import type { AttendanceResponse, HolidayAllowanceResponse } from './types';
+import type { AttendanceResponse, HolidayAllowanceResponse, LeaveResponse } from './types';
 
 const HUB_BASE: string = (import.meta.env.VITE_HUB_API_BASE as string | undefined) ?? '';
 
@@ -86,4 +86,12 @@ export const hubApi = {
     hubFetch<HolidayAllowanceResponse>('/api/holiday-allowances', {
       method: 'GET',
     }),
+
+  leaveRequests: (params?: { status?: string; limit?: number }): Promise<LeaveResponse> => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set('status', params.status);
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const query = qs.toString() ? `?${qs.toString()}` : '';
+    return hubFetch<LeaveResponse>(`/api/leave-requests${query}`, { method: 'GET' });
+  },
 };

@@ -146,3 +146,31 @@ export interface HolidayAllowanceResponse {
   policies: HolidayAllowancePolicy[];
   totalsByBrand: HolidayAllowancePolicyBrandMix[];
 }
+
+export interface LeaveRecord {
+  id: number;
+  status: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  daysDeducted: number | null;
+  notes: string | null;
+  halfStart: boolean;
+  halfEnd: boolean;
+  cancelled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  employeeId: number | null;
+  employeeName: string;
+  employeeBrand: string;
+  employeeDepartment: string | null;
+  reviewedById: number | null;
+}
+
+export interface LeaveResponse {
+  statusFilter: string;
+  limit: number;
+  total: number;
+  records: LeaveRecord[];
+  statusCounts: Record<string, number>;
+}
