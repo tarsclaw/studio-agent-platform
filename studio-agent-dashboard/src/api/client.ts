@@ -9,6 +9,7 @@ import type {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const TENANT_ID = import.meta.env.VITE_TENANT_ID;
+const LOCAL_AUTH_BYPASS = import.meta.env.VITE_LOCAL_AUTH_BYPASS === 'true';
 
 function buildUrl(path: string): URL {
   if (BASE_URL.startsWith('http://') || BASE_URL.startsWith('https://')) {
@@ -33,7 +34,9 @@ async function fetchDashboard<T>(endpoint: string, params?: Record<string, strin
   const res = await fetch(url.toString());
 
   if (res.status === 401) {
-    window.location.href = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
+    if (!LOCAL_AUTH_BYPASS) {
+      window.location.href = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
+    }
     throw new Error('Unauthorized');
   }
 

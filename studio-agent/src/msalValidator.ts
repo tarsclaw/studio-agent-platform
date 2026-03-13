@@ -68,6 +68,17 @@ export function requireMsalAuth(
   res: Response,
   next: NextFunction
 ): void {
+  if (process.env.DASHBOARD_DEV_AUTH_BYPASS === "true") {
+    req.auth = {
+      oid: process.env.DASHBOARD_DEV_OID || "local-dev-user",
+      tid: process.env.AZURE_AD_TENANT_ID || "local-dev-tenant",
+      name: process.env.DASHBOARD_DEV_NAME || "Local Dev User",
+      email: process.env.DASHBOARD_DEV_EMAIL || "dev@local",
+    };
+    next();
+    return;
+  }
+
   const tenantId = process.env.AZURE_AD_TENANT_ID;
   const clientId = process.env.AZURE_AD_CLIENT_ID;
 

@@ -5,7 +5,9 @@ import { Wordmark } from '../components/shared/Wordmark';
 const ease = [0.16, 1, 0.3, 1] as const;
 
 export function LandingPage() {
-  const signInUrl = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
+  const signInUrl = import.meta.env.VITE_LOCAL_AUTH_BYPASS === 'true'
+    ? '/dashboard'
+    : '/.auth/login/aad?post_login_redirect_uri=/dashboard';
 
   return (
     <div className="landing-bg min-h-screen text-[var(--text-primary)]">

@@ -96,3 +96,28 @@ export interface EventsResponse {
   correlation_id: string;
   events: any[];
 }
+
+export interface AttendanceGroupCounts {
+  absent: number;
+  present: number;
+}
+
+export interface AttendanceAbsenceRecord {
+  employeeName: string;
+  type: string;
+  brand: string;
+  location: string;
+  department: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface AttendanceResponse {
+  date: string;
+  totalEmployees: number;
+  totalAbsent: number;
+  totalPresent: number;
+  absences: AttendanceAbsenceRecord[];
+  byBrand: Record<string, AttendanceGroupCounts>;
+  byLocation: Record<string, AttendanceGroupCounts>;
+}

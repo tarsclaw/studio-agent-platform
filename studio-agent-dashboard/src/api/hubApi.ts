@@ -15,6 +15,8 @@
  *   The UI handles both states gracefully rather than crashing.
  */
 
+import type { AttendanceResponse } from './types';
+
 const HUB_BASE: string = (import.meta.env.VITE_HUB_API_BASE as string | undefined) ?? '';
 
 export interface ChatMessage {
@@ -73,5 +75,10 @@ export const hubApi = {
     hubFetch<ChatResponse>('/api/chat', {
       method: 'POST',
       body: JSON.stringify(req),
+    }),
+
+  attendance: (date: string): Promise<AttendanceResponse> =>
+    hubFetch<AttendanceResponse>(`/api/attendance?date=${encodeURIComponent(date)}`, {
+      method: 'GET',
     }),
 };
