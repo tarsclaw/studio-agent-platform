@@ -1,5 +1,6 @@
 import {
   Activity,
+  Bot,
   Gauge,
   GitCompare,
   LayoutDashboard,
@@ -12,7 +13,10 @@ import type { User } from '../../api/auth';
 import { Wordmark } from '../shared/Wordmark';
 
 const navItems = [
-  { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  // Wave 1 — AI Hub first
+  { to: '/dashboard/ai-hub', label: 'AI Hub', icon: Bot },
+  // Analytics (existing)
+  { to: '/dashboard/overview', label: 'Overview', icon: LayoutDashboard },
   { to: '/dashboard/roi', label: 'ROI & Savings', icon: PiggyBank },
   { to: '/dashboard/usage', label: 'Usage & Adoption', icon: Activity },
   { to: '/dashboard/performance', label: 'Performance', icon: Gauge },
@@ -31,7 +35,7 @@ export function Sidebar({ user }: { user: User }) {
           <NavLink
             key={to}
             to={to}
-            end={to === '/dashboard'}
+            end
             className={({ isActive }) =>
               `group relative flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors ${
                 isActive

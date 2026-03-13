@@ -11,13 +11,18 @@ import {
   hashUser,
 } from "./telemetry";
 
+import {
+  initRelevanceClient,
+  waitForBestAgentReply,
+} from "./src/relevanceClient";
+
 // ★ NEW IMPORT — wires up your dead telemetryQueue.ts
 import { enqueueTelemetry } from "./telemetryQueue";
 
 // ★ NEW IMPORT — the turn envelope builder
 import { buildTurnEnvelope } from "./turnEnvelope";
 
-const { Agent, createClient } = RelevanceSDK as any;
+const { Agent } = RelevanceSDK as any;
 
 export const app = new App({
   storage: new LocalStorage(),
@@ -36,47 +41,23 @@ function detectAgentType(): "employee" | "admin" {
   return (process.env.AGENT_TYPE as "employee" | "admin") || "employee";
 }
 
-// SDK 3.0.2 exports REGION_EU / REGION_US / REGION_AU as stack codes
-function resolveRegion(input?: string) {
-  const sdk: any = RelevanceSDK as any;
-
-  if (!sdk.REGION_US || !sdk.REGION_EU || !sdk.REGION_AU) {
-    throw new Error(
-      "SDK missing REGION_US/EU/AU exports. Confirm @relevanceai/sdk version and exports."
-    );
-  }
-
-  const r = (input || "US").toUpperCase();
-  if (r === "EU") return sdk.REGION_EU;
-  if (r === "AU") return sdk.REGION_AU;
-  return sdk.REGION_US;
-}
-
 // -------------------------
-// Relevance SDK init (once)
+// Relevance SDK init (once, via shared module)
 // -------------------------
-const apiKey = process.env.RELEVANCE_API_KEY;
-const project = process.env.RELEVANCE_PROJECT_ID || process.env.PROJECT_ID;
 const agentId = process.env.RELEVANCE_AGENT_ID;
 
-const region = resolveRegion(process.env.RELEVANCE_REGION);
-
-console.log("[Relevance] Using project:", project);
 console.log("[Relevance] Using agentId:", agentId);
-console.log("[Relevance] Using env RELEVANCE_REGION:", process.env.RELEVANCE_REGION);
-console.log("[Relevance] Resolved region stack code:", region);
 
-if (apiKey && project) {
-  createClient({ apiKey, region, project });
-} else {
-  console.warn("[Relevance] Missing RELEVANCE_API_KEY or RELEVANCE_PROJECT_ID/PROJECT_ID");
-}
+// initRelevanceClient() is idempotent — logs project + region and calls
+// createClient() exactly once across the whole process.
+initRelevanceClient();
 
 let agentPromise: Promise<any> | null = null;
 async function getAgent() {
   if (!agentId) throw new Error("Missing RELEVANCE_AGENT_ID");
-  if (!apiKey) throw new Error("Missing RELEVANCE_API_KEY");
-  if (!project) throw new Error("Missing RELEVANCE_PROJECT_ID (or PROJECT_ID)");
+  if (!process.env.RELEVANCE_API_KEY) throw new Error("Missing RELEVANCE_API_KEY");
+  if (!process.env.RELEVANCE_PROJECT_ID && !process.env.PROJECT_ID)
+    throw new Error("Missing RELEVANCE_PROJECT_ID (or PROJECT_ID)");
   if (!agentPromise) agentPromise = Agent.get(agentId);
   return agentPromise;
 }
@@ -99,79 +80,6 @@ async function withThreadLock(threadId: string, fn: () => Promise<void>) {
     release();
     if (threadLocks.get(threadId) === next) threadLocks.delete(threadId);
   }
-}
-
-// -------------------------
-// Task waiting (events-driven)
-// -------------------------
-async function waitForBestAgentReply(task: any, opts?: { timeoutMs?: number; settleMs?: number }) {
-  const timeoutMs = opts?.timeoutMs ?? 120_000;
-  const settleMs = opts?.settleMs ?? 1500;
-
-  return await new Promise<string>((resolve, reject) => {
-    let latestAgentText = "";
-    let settled = false;
-
-    let settleTimer: NodeJS.Timeout | null = null;
-    const resetSettleTimer = () => {
-      if (settleTimer) clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => {
-        if (latestAgentText) finishResolve(latestAgentText);
-      }, settleMs);
-    };
-
-    const hardTimeout = setTimeout(
-      () => finishReject(new Error("Timed out waiting for agent reply")),
-      timeoutMs
-    );
-
-    const cleanup = () => {
-      clearTimeout(hardTimeout);
-      if (settleTimer) clearTimeout(settleTimer);
-      task.removeEventListener("message", onMessage as any);
-      task.removeEventListener("error", onError as any);
-      task.removeEventListener("update", onUpdate as any);
-      try {
-        task.unsubscribe();
-      } catch {}
-    };
-
-    const finishResolve = (text: string) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      resolve(text);
-    };
-
-    const finishReject = (err: Error) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      reject(err);
-    };
-
-    const onMessage = ({ detail: { message } }: any) => {
-      if (message?.isAgent && typeof message.isAgent === "function" && message.isAgent()) {
-        latestAgentText = String(message.text ?? "");
-        resetSettleTimer();
-      }
-    };
-
-    const onError = ({ detail: { message } }: any) => {
-      const lastError = message?.lastError ? String(message.lastError) : "Unknown task error";
-      finishReject(new Error(lastError));
-    };
-
-    const onUpdate = () => {
-      const status = String(task?.status ?? "");
-      if (status === "idle" && latestAgentText) finishResolve(latestAgentText);
-      if (status === "error") finishReject(new Error("Task entered error status"));
-    };
-
-    task.addEventListener("message", onMessage as any);
-    task.addEventListener("error", onError as any);
-    task.addEventListener("update", onUpdate as any);
-  });
 }
 
 function taskKey(threadId: string) {

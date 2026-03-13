@@ -1,5 +1,6 @@
 import { app } from "./app";
 import { initTelemetry } from "./telemetry";
+import { startDashboardServer } from "./src/dashboardServer";
 
 /**
  * Env var compatibility layer:
@@ -32,4 +33,8 @@ initTelemetry();
 (async () => {
   await app.start();
   console.log(`Bot started, app listening on`, process.env.PORT || process.env.port || 3978);
+
+  // Start dashboard API server in the same process on DASHBOARD_PORT (default 3979).
+  // The Teams relay is untouched — each server manages its own port and concerns.
+  startDashboardServer();
 })();

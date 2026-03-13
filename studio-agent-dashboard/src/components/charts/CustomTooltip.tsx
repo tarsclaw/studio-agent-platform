@@ -18,7 +18,7 @@ export function CustomTooltip({ active, payload, label, formatter }: CustomToolt
 
   return (
     <div className="rounded-md border border-[var(--border-primary)] bg-[var(--bg-primary)] px-4 py-3 shadow-[var(--shadow-lg)]">
-      {label !== undefined && <div className="mb-2 text-xs font-medium text-[var(--text-tertiary)]">{formatTooltipLabel(label)}</div>}
+      {label !== undefined && <div className="mb-2 text-xs font-medium text-[var(--text-tertiary)]">{formatTooltipLabel(String(label))}</div>}
       <div className="space-y-1">
         {payload.map((entry) => {
           const value = typeof entry.value === 'number' && formatter ? formatter(entry.value) : entry.value;
