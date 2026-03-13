@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { LoadingScreen } from '../../pages/LoadingScreen';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { ChatWidget } from '../chat/ChatWidget';
 
 function lastThirtyDaysRange() {
   const to = new Date();
@@ -54,6 +55,7 @@ export function Shell() {
         >
           <Sidebar user={user} />
           <TopBar user={user} />
+          <ChatWidget />
           <main className="ml-[240px] bg-[var(--bg-secondary)] pt-14">
             <div className="h-[calc(100vh-56px)] overflow-y-auto p-8">
               <div className="mx-auto max-w-[1400px]">

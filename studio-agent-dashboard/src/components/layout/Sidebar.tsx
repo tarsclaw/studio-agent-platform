@@ -1,6 +1,5 @@
 import {
   Activity,
-  Bot,
   Gauge,
   GitCompare,
   LayoutDashboard,
@@ -13,9 +12,6 @@ import type { User } from '../../api/auth';
 import { Wordmark } from '../shared/Wordmark';
 
 const navItems = [
-  // Wave 1 — AI Hub first
-  { to: '/dashboard/ai-hub', label: 'AI Hub', icon: Bot },
-  // Analytics (existing)
   { to: '/dashboard/overview', label: 'Overview', icon: LayoutDashboard },
   { to: '/dashboard/roi', label: 'ROI & Savings', icon: PiggyBank },
   { to: '/dashboard/usage', label: 'Usage & Adoption', icon: Activity },
