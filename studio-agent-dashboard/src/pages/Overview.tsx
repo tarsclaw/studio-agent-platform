@@ -20,6 +20,7 @@ import { ErrorState } from '../components/shared/ErrorState';
 import { MetricCard } from '../components/cards/MetricCard';
 import { MetricGrid } from '../components/cards/MetricGrid';
 import { AttendanceWidget } from '../components/attendance/AttendanceWidget';
+import { HolidayAllowanceWidget } from '../components/attendance/HolidayAllowanceWidget';
 import { formatCurrency, formatHours, formatNumber, formatPercent, formatToolName } from '../lib/formatters';
 
 function getLast30DaysRange() {
@@ -146,6 +147,10 @@ export function Overview() {
 
       <motion.div variants={item}>
         <AttendanceWidget />
+      </motion.div>
+
+      <motion.div variants={item}>
+        <HolidayAllowanceWidget />
       </motion.div>
 
       <motion.section variants={item} className="card p-6">

@@ -22,6 +22,7 @@
 import express from "express";
 import chatRouter from "./chatProxy";
 import attendanceRouter from "./attendanceProxy";
+import holidayAllowanceRouter from "./holidayAllowanceProxy";
 
 export function startDashboardServer(): void {
   const port = Number(process.env.DASHBOARD_PORT) || 3979;
@@ -53,6 +54,7 @@ export function startDashboardServer(): void {
 
   app.use("/api/chat", chatRouter);
   app.use("/api/attendance", attendanceRouter);
+  app.use("/api/holiday-allowances", holidayAllowanceRouter);
 
   // Catch-all 404
   app.use((_req, res) => {

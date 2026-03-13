@@ -25,7 +25,8 @@
  *
  * Agent selection
  *   Defaults to the employee agent (RELEVANCE_AGENT_ID env var).
- *   Admin functions remain in Teams for now; chat/admin split can be added later.
+ *   For dashboard admin mode, RELEVANCE_ADMIN_AGENT_ID may be used when the
+ *   authenticated dashboard user resolves to role=admin.
  *
  * Auth dependency
  *   Blocked on AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID (John Jobling / Allect IT).
@@ -66,19 +67,25 @@ router.post(
       return;
     }
 
-    const agentId = process.env.RELEVANCE_AGENT_ID;
+    const dashboardRole = auth.role ?? 'employee';
+    const agentId = dashboardRole === 'admin'
+      ? (process.env.RELEVANCE_ADMIN_AGENT_ID || process.env.RELEVANCE_AGENT_ID)
+      : process.env.RELEVANCE_AGENT_ID;
     if (!agentId) {
       res.status(503).json({
         error: "agent_not_configured",
         message:
-          "RELEVANCE_AGENT_ID is not set.  The employee agent ID must be " +
-          "provided to handle web chat requests.",
+          dashboardRole === 'admin'
+            ? "RELEVANCE_ADMIN_AGENT_ID (or fallback RELEVANCE_AGENT_ID) must be set for admin dashboard chat."
+            : "RELEVANCE_AGENT_ID is not set. The employee agent ID must be provided to handle web chat requests.",
       });
       return;
     }
 
     const tenant_id = auth.tid;
     const aad_object_id = auth.oid;
+    const user_name = auth.name;
+    const user_email = auth.email;
 
     // Callers may pass a conversation_id to maintain thread continuity across
     // multiple requests.  If absent, a stable per-user ID is derived.
@@ -97,7 +104,13 @@ router.post(
       conversation_id,
       thread_id,
       event_id,
-      channel: "web",
+      channel: dashboardRole === 'admin' ? 'web-admin' : 'web',
+      role: dashboardRole,
+      name: user_name,
+      user_name,
+      email: user_email,
+      user_email,
+      preferred_username: user_email,
     });
 
     try {
@@ -108,7 +121,7 @@ router.post(
         settleMs: 1500,
       });
 
-      res.json({ reply: reply || "", conversation_id });
+      res.json({ reply: reply || "", conversation_id, role: dashboardRole, agent_id: agentId });
     } catch (err: unknown) {
       const e = err as any;
       trackException(err as Error, { channel: "web", tenant_id, aad_object_id });

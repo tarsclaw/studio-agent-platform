@@ -121,3 +121,28 @@ export interface AttendanceResponse {
   byBrand: Record<string, AttendanceGroupCounts>;
   byLocation: Record<string, AttendanceGroupCounts>;
 }
+
+export interface HolidayAllowancePolicyBrandMix {
+  brand: string;
+  count: number;
+}
+
+export interface HolidayAllowancePolicy {
+  id: number | null;
+  name: string;
+  units: string;
+  amount: number | null;
+  employeeCount: number;
+  defaultPolicy: boolean;
+  carryoverAllowed: boolean;
+  dependsOnService: boolean;
+  brandMix: HolidayAllowancePolicyBrandMix[];
+}
+
+export interface HolidayAllowanceResponse {
+  totalEmployees: number;
+  totalPolicies: number;
+  defaultPolicy: HolidayAllowancePolicy | null;
+  policies: HolidayAllowancePolicy[];
+  totalsByBrand: HolidayAllowancePolicyBrandMix[];
+}

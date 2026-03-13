@@ -15,7 +15,7 @@
  *   The UI handles both states gracefully rather than crashing.
  */
 
-import type { AttendanceResponse } from './types';
+import type { AttendanceResponse, HolidayAllowanceResponse } from './types';
 
 const HUB_BASE: string = (import.meta.env.VITE_HUB_API_BASE as string | undefined) ?? '';
 
@@ -79,6 +79,11 @@ export const hubApi = {
 
   attendance: (date: string): Promise<AttendanceResponse> =>
     hubFetch<AttendanceResponse>(`/api/attendance?date=${encodeURIComponent(date)}`, {
+      method: 'GET',
+    }),
+
+  holidayAllowances: (): Promise<HolidayAllowanceResponse> =>
+    hubFetch<HolidayAllowanceResponse>('/api/holiday-allowances', {
       method: 'GET',
     }),
 };

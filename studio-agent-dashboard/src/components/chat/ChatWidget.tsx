@@ -5,44 +5,71 @@
  * Replaces the dedicated AI Hub page — available globally across all dashboard pages.
  */
 
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bot, Send, AlertCircle, Loader2, X, RotateCcw } from 'lucide-react';
+import {
+  AlertCircle,
+  Loader2,
+  RotateCcw,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import { hubApi, HubApiResponseError, type ChatMessage } from '../../api/hubApi';
 
 const PLACEHOLDER_PROMPTS = [
-  'How many holiday days do I have left?',
-  "What's the WFH policy?",
-  "Who's in the Chelsea studio today?",
-  'Help me log a sick day.',
+  'Show me all pending leave requests.',
+  'Who is out of the studio today?',
+  'List employees in the Chelsea studio.',
+  'How many holiday days do we get?',
 ];
 
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
+function StudioAgentMark({ compact = false }: { compact?: boolean }) {
+  return (
+    <div
+      className={`relative flex items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-white shadow-[0_10px_25px_rgba(16,185,129,0.25)] ${
+        compact ? 'h-8 w-8 rounded-xl' : 'h-11 w-11'
+      }`}
+    >
+      <div className="absolute inset-[1px] rounded-[inherit] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.35),transparent_55%)]" />
+      <ShieldCheck size={compact ? 15 : 20} strokeWidth={2} className="relative z-10" />
+      <Sparkles size={compact ? 10 : 12} className="absolute right-1.5 top-1.5 z-10 text-white/90" />
+    </div>
+  );
+}
 
 function EmptyState({ onSelect }: { onSelect: (text: string) => void }) {
   return (
-    <div className="flex flex-col items-center gap-5 py-6 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--brand-primary-light)]">
-        <Bot size={24} strokeWidth={1.5} className="text-[var(--brand-primary)]" />
+    <div className="flex flex-col gap-5 py-5">
+      <div className="flex items-start gap-3 rounded-2xl border border-[var(--border-primary)] bg-[linear-gradient(135deg,rgba(16,185,129,0.10),rgba(255,255,255,0.95))] px-4 py-4">
+        <StudioAgentMark />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[var(--text-primary)]">Admin assistant, ready</p>
+          <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+            Use Studio Agent for live HR checks, leave operations, attendance questions, and quick policy guidance.
+          </p>
+        </div>
       </div>
+
       <div>
-        <p className="text-sm font-semibold text-[var(--text-primary)]">Studio Agent</p>
-        <p className="mt-1 text-xs text-[var(--text-secondary)]">
-          Ask about HR, leave, studio operations, and more.
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+          Try one of these
         </p>
-      </div>
-      <div className="w-full space-y-1.5">
-        {PLACEHOLDER_PROMPTS.map((prompt) => (
-          <button
-            key={prompt}
-            onClick={() => onSelect(prompt)}
-            className="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] px-3 py-2 text-left text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--text-primary)]"
-          >
-            {prompt}
-          </button>
-        ))}
+        <div className="grid gap-2">
+          {PLACEHOLDER_PROMPTS.map((prompt) => (
+            <button
+              key={prompt}
+              onClick={() => onSelect(prompt)}
+              className="group w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-3.5 py-3 text-left text-sm text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all hover:-translate-y-0.5 hover:border-[var(--brand-primary)] hover:bg-[var(--bg-primary)] hover:text-[var(--text-primary)]"
+            >
+              <span className="flex items-start justify-between gap-3">
+                <span>{prompt}</span>
+                <Sparkles size={14} className="mt-0.5 flex-shrink-0 text-[var(--text-tertiary)] transition-colors group-hover:text-[var(--brand-primary)]" />
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -50,20 +77,19 @@ function EmptyState({ onSelect }: { onSelect: (text: string) => void }) {
 
 function Bubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
+
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
-        <div className="mr-2 mt-1 flex-shrink-0">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--brand-primary-light)]">
-            <Bot size={12} strokeWidth={2} className="text-[var(--brand-primary)]" />
-          </div>
+        <div className="mr-2.5 mt-1 flex-shrink-0">
+          <StudioAgentMark compact />
         </div>
       )}
       <div
-        className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
+        className={`max-w-[84%] rounded-[20px] px-4 py-3 text-sm leading-relaxed shadow-[var(--shadow-sm)] ${
           isUser
             ? 'bg-[var(--brand-primary)] text-white'
-            : 'bg-[var(--bg-secondary)] text-[var(--text-primary)] ring-1 ring-[var(--border-primary)]'
+            : 'border border-[var(--border-primary)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
         }`}
         style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
       >
@@ -76,21 +102,17 @@ function Bubble({ message }: { message: ChatMessage }) {
 function StatusBanner({ status }: { status: 503 | 401 | 'error' | null }) {
   if (!status) return null;
   const messages: Record<string, string> = {
-    503: 'Studio Agent is pending Azure AD configuration. It will be available once Allect IT complete setup.',
-    401: 'Session expired — please refresh.',
-    error: 'Unexpected error. Please try again.',
+    503: 'Studio Agent is waiting on dashboard auth or agent configuration before chat can complete.',
+    401: 'Your dashboard session expired — refresh and try again.',
+    error: 'Something went wrong while contacting Studio Agent. Please retry.',
   };
   return (
-    <div className="flex items-start gap-2 rounded-lg border border-[var(--color-warning)] bg-[var(--color-warning-light)] px-3 py-2 text-xs text-[var(--text-primary)]">
+    <div className="flex items-start gap-2 rounded-xl border border-[var(--color-warning)] bg-[var(--color-warning-light)] px-3 py-2.5 text-xs text-[var(--text-primary)]">
       <AlertCircle size={13} className="mt-0.5 flex-shrink-0 text-[var(--color-warning)]" />
-      <span>{messages[String(status)] ?? messages['error']}</span>
+      <span>{messages[String(status)] ?? messages.error}</span>
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Main widget
-// ---------------------------------------------------------------------------
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -100,6 +122,12 @@ export function ChatWidget() {
   const [bannerStatus, setBannerStatus] = useState<503 | 401 | 'error' | null>(null);
   const [conversationId, setConversationId] = useState<string | undefined>(undefined);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const quickStatus = useMemo(() => {
+    if (isLoading) return 'Working';
+    if (conversationId) return 'Live conversation';
+    return 'Admin ready';
+  }, [conversationId, isLoading]);
 
   function resetConversation() {
     setMessages([]);
@@ -144,65 +172,69 @@ export function ChatWidget() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-      {/* Chat panel */}
       <AnimatePresence>
         {open && (
           <motion.div
             key="panel"
-            initial={{ opacity: 0, y: 12, scale: 0.97 }}
+            initial={{ opacity: 0, y: 14, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="flex w-[360px] flex-col overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-primary)] shadow-[0_8px_30px_rgba(0,0,0,0.10)]"
-            style={{ height: '520px' }}
+            exit={{ opacity: 0, y: 14, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="flex w-[420px] flex-col overflow-hidden rounded-[28px] border border-[var(--border-primary)] bg-[var(--bg-primary)] shadow-[0_24px_70px_rgba(15,23,42,0.18)]"
+            style={{ height: '620px' }}
           >
-            {/* Header */}
-            <div className="flex items-center gap-2.5 border-b border-[var(--border-subtle)] px-4 py-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--brand-primary-light)]">
-                <Bot size={15} strokeWidth={1.75} className="text-[var(--brand-primary)]" />
+            <div className="border-b border-[var(--border-subtle)] bg-[linear-gradient(180deg,rgba(16,185,129,0.08),rgba(255,255,255,0.96))] px-5 py-4">
+              <div className="flex items-start gap-3">
+                <StudioAgentMark />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-sm font-semibold text-[var(--text-primary)]">Studio Agent</p>
+                    <span className="rounded-full border border-emerald-200 bg-white/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                      {quickStatus}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                    Premium admin access for attendance, leave, and operations support.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
+                  {conversationId && (
+                    <button
+                      onClick={resetConversation}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--text-tertiary)] transition-colors hover:bg-white hover:text-[var(--text-secondary)]"
+                      aria-label="New conversation"
+                      title="New conversation"
+                    >
+                      <RotateCcw size={15} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--text-tertiary)] transition-colors hover:bg-white hover:text-[var(--text-secondary)]"
+                    aria-label="Close"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[var(--text-primary)] leading-none">Studio Agent</p>
-                <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">Rigby &amp; Rigby · Helen Green · Lawson Robb</p>
-              </div>
-              {conversationId && (
-                <button
-                  onClick={resetConversation}
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-secondary)]"
-                  aria-label="New conversation"
-                  title="New conversation"
-                >
-                  <RotateCcw size={13} />
-                </button>
-              )}
-              <button
-                onClick={() => setOpen(false)}
-                className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-secondary)]"
-                aria-label="Close"
-              >
-                <X size={15} />
-              </button>
             </div>
 
-            {/* Message area */}
-            <div className="flex-1 overflow-y-auto px-4 py-4">
+            <div className="flex-1 overflow-y-auto px-5 py-4">
               {messages.length === 0 ? (
-                <EmptyState onSelect={(t) => { void sendMessage(t); }} />
+                <EmptyState onSelect={(t) => void sendMessage(t)} />
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   {messages.map((msg, i) => (
                     <Bubble key={i} message={msg} />
                   ))}
                   {isLoading && (
                     <div className="flex justify-start">
-                      <div className="mr-2 mt-1 flex-shrink-0">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--brand-primary-light)]">
-                          <Bot size={12} strokeWidth={2} className="text-[var(--brand-primary)]" />
-                        </div>
+                      <div className="mr-2.5 mt-1 flex-shrink-0">
+                        <StudioAgentMark compact />
                       </div>
-                      <div className="flex items-center gap-1.5 rounded-2xl bg-[var(--bg-secondary)] px-3 py-2 text-xs text-[var(--text-tertiary)] ring-1 ring-[var(--border-primary)]">
-                        <Loader2 size={11} className="animate-spin" />
-                        Thinking…
+                      <div className="flex items-center gap-2 rounded-[20px] border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-4 py-3 text-sm text-[var(--text-secondary)] shadow-[var(--shadow-sm)]">
+                        <Loader2 size={14} className="animate-spin" />
+                        Studio Agent is thinking…
                       </div>
                     </div>
                   )}
@@ -211,65 +243,85 @@ export function ChatWidget() {
               )}
             </div>
 
-            {/* Status banner */}
             {bannerStatus && (
-              <div className="px-4 pb-2">
+              <div className="px-5 pb-3">
                 <StatusBanner status={bannerStatus} />
               </div>
             )}
 
-            {/* Input */}
-            <div className="flex items-end gap-2 border-t border-[var(--border-subtle)] px-3 py-3">
-              <textarea
-                rows={1}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask anything…"
-                disabled={isLoading}
-                className="min-h-[36px] flex-1 resize-none rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] px-3 py-2 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--brand-primary)] focus:outline-none disabled:opacity-50"
-                style={{ maxHeight: '96px' }}
-                onInput={(e) => {
-                  const el = e.currentTarget;
-                  el.style.height = 'auto';
-                  el.style.height = `${Math.min(el.scrollHeight, 96)}px`;
-                }}
-              />
-              <button
-                onClick={() => void sendMessage(inputText)}
-                disabled={!inputText.trim() || isLoading}
-                className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--brand-primary)] text-white transition-opacity disabled:opacity-40 hover:opacity-90"
-                aria-label="Send"
-              >
-                {isLoading ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
-              </button>
+            <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-primary)] px-4 py-4">
+              <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
+                <div className="flex items-end gap-2">
+                  <textarea
+                    rows={1}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask Studio Agent anything admin-related…"
+                    disabled={isLoading}
+                    className="min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none disabled:opacity-50"
+                    style={{ maxHeight: '120px' }}
+                    onInput={(e) => {
+                      const el = e.currentTarget;
+                      el.style.height = 'auto';
+                      el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+                    }}
+                  />
+                  <button
+                    onClick={() => void sendMessage(inputText)}
+                    disabled={!inputText.trim() || isLoading}
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--brand-primary)] text-white shadow-[0_10px_25px_rgba(16,185,129,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[var(--brand-primary-dark)] disabled:translate-y-0 disabled:opacity-40"
+                    aria-label="Send"
+                  >
+                    {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  </button>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* FAB trigger */}
       <motion.button
         onClick={() => setOpen((v) => !v)}
-        whileTap={{ scale: 0.94 }}
-        className={`flex h-12 w-12 items-center justify-center rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-colors ${
+        whileTap={{ scale: 0.96 }}
+        className={`group flex h-14 items-center gap-2.5 rounded-full px-4 shadow-[0_18px_45px_rgba(15,23,42,0.16)] transition-all ${
           open
-            ? 'bg-[var(--bg-primary)] text-[var(--text-secondary)] ring-1 ring-[var(--border-primary)]'
-            : 'bg-[var(--brand-primary)] text-white hover:opacity-90'
+            ? 'border border-[var(--border-primary)] bg-[var(--bg-primary)] text-[var(--text-secondary)]'
+            : 'bg-[linear-gradient(135deg,var(--brand-primary),var(--brand-primary-dark))] text-white hover:-translate-y-0.5'
         }`}
         aria-label={open ? 'Close Studio Agent' : 'Open Studio Agent'}
       >
-        <AnimatePresence mode="wait" initial={false}>
-          {open ? (
-            <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.12 }}>
-              <X size={18} />
-            </motion.span>
-          ) : (
-            <motion.span key="bot" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.12 }}>
-              <Bot size={20} strokeWidth={1.75} />
-            </motion.span>
-          )}
-        </AnimatePresence>
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-full ${
+            open ? 'bg-[var(--bg-secondary)]' : 'bg-white/16'
+          }`}
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            {open ? (
+              <motion.span
+                key="x"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.12 }}
+              >
+                <X size={18} />
+              </motion.span>
+            ) : (
+              <motion.span
+                key="mark"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.12 }}
+              >
+                <ShieldCheck size={18} strokeWidth={2} />
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </span>
+        <span className="pr-1 text-sm font-semibold">Studio Agent</span>
       </motion.button>
     </div>
   );
