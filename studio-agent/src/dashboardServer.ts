@@ -27,20 +27,27 @@ import leaveRouter from "./leaveProxy";
 
 export function startDashboardServer(hostApp?: Express): void {
   const port = Number(process.env.DASHBOARD_PORT) || 3979;
-  const allowedOrigin = process.env.DASHBOARD_ALLOWED_ORIGIN ?? "";
+  const allowedOrigins = (process.env.DASHBOARD_ALLOWED_ORIGIN ?? "")
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
 
   const app = hostApp ?? express();
 
   // Parse JSON bodies up to 1 MB
   app.use(express.json({ limit: "1mb" }));
 
-  // CORS — only enabled when DASHBOARD_ALLOWED_ORIGIN is explicitly set
-  if (allowedOrigin) {
-    app.use((_req, res, next) => {
-      res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  // CORS — enabled only for explicitly allowed origins.
+  if (allowedOrigins.length > 0) {
+    app.use((req, res, next) => {
+      const origin = req.headers.origin;
+      if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+        res.setHeader("Vary", "Origin");
+      }
       res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-      if (_req.method === "OPTIONS") {
+      if (req.method === "OPTIONS") {
         res.sendStatus(204);
         return;
       }
