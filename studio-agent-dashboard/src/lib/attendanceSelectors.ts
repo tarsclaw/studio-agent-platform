@@ -28,6 +28,17 @@ export interface AttendanceAlertItem {
   tone: 'neutral' | 'warning' | 'positive';
 }
 
+export interface AttendancePersonSummary {
+  employeeName: string;
+  company: string;
+  department: string;
+  location: string;
+  status: 'out';
+  type: string;
+  startDate: string;
+  endDate: string;
+}
+
 function normalizeCompany(name: string): string {
   const lower = name.toLowerCase();
   if (lower.includes('rigby')) return 'Rigby & Rigby';
@@ -110,6 +121,21 @@ export function getLocationSummaries(data: AttendanceResponse) {
       absenceRate: counts.present + counts.absent > 0 ? Math.round((counts.absent / (counts.present + counts.absent)) * 100) : 0,
     }))
     .sort((a, b) => b.total - a.total);
+}
+
+export function getPeopleSummaries(data: AttendanceResponse): AttendancePersonSummary[] {
+  return (data.absences ?? [])
+    .map((absence) => ({
+      employeeName: absence.employeeName,
+      company: normalizeCompany(absence.brand || 'Unknown'),
+      department: absence.department || 'Unknown',
+      location: absence.location || 'Unknown',
+      status: 'out' as const,
+      type: absence.type,
+      startDate: absence.startDate,
+      endDate: absence.endDate,
+    }))
+    .sort((a, b) => a.employeeName.localeCompare(b.employeeName));
 }
 
 export function getAttendanceAlerts(data: AttendanceResponse): AttendanceAlertItem[] {

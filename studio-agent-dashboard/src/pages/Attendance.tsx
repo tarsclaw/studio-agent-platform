@@ -8,11 +8,12 @@ import { AttendanceCompanyDetail } from '../components/attendance/AttendanceComp
 import { AttendanceDepartmentBoard } from '../components/attendance/AttendanceDepartmentBoard';
 import { AttendanceDepartmentMode } from '../components/attendance/AttendanceDepartmentMode';
 import { AttendanceModeSwitch, type AttendanceMode } from '../components/attendance/AttendanceModeSwitch';
+import { AttendancePeopleMode } from '../components/attendance/AttendancePeopleMode';
 import { AttendanceSummaryBand } from '../components/attendance/AttendanceSummaryBand';
 import { EmptyState } from '../components/shared/EmptyState';
 import { ErrorState } from '../components/shared/ErrorState';
 import { LoadingSkeleton } from '../components/shared/LoadingSkeleton';
-import { getAttendanceAlerts, getCompanySummaries, getDepartmentSummaries, getLocationSummaries } from '../lib/attendanceSelectors';
+import { getAttendanceAlerts, getCompanySummaries, getDepartmentSummaries, getLocationSummaries, getPeopleSummaries } from '../lib/attendanceSelectors';
 import { HubApiResponseError } from '../api/hubApi';
 
 function todayDateString() {
@@ -31,6 +32,7 @@ export function Attendance() {
     return {
       companies,
       departments: getDepartmentSummaries(query.data),
+      people: getPeopleSummaries(query.data),
       alerts: getAttendanceAlerts(query.data),
       locations: getLocationSummaries(query.data),
       selectedCompany: companies.find((item) => item.name === selectedCompany) ?? companies[0] ?? null,
@@ -152,12 +154,7 @@ export function Attendance() {
 
       {mode === 'department' && <AttendanceDepartmentMode departments={model.departments} />}
 
-      {mode === 'people' && (
-        <EmptyState
-          title="People mode is next in the build queue"
-          body="The next tranche will add a searchable people roster with company, department, location, and status filtering."
-        />
-      )}
+      {mode === 'people' && <AttendancePeopleMode people={model.people} />}
     </div>
   );
 }
