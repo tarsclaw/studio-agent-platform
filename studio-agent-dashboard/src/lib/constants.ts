@@ -16,6 +16,7 @@ export const ROUTE_META: Record<string, { title: string; subtitle: string }> = {
   '/dashboard':             { title: 'AI Hub',             subtitle: 'Chat with your studio assistant' },
   '/dashboard/ai-hub':      { title: 'AI Hub',             subtitle: 'Chat with your studio assistant' },
   '/dashboard/overview':    { title: 'Overview',           subtitle: 'Key metrics at a glance' },
+  '/dashboard/attendance':  { title: 'Who’s In / Who’s Out', subtitle: 'Live attendance visibility across all studios and brands' },
   '/dashboard/roi':         { title: 'ROI & Savings',      subtitle: 'Financial impact of AI automation' },
   '/dashboard/usage':       { title: 'Usage & Adoption',   subtitle: 'How the team is using the bot' },
   '/dashboard/performance': { title: 'Performance',        subtitle: 'Latency and reliability metrics' },

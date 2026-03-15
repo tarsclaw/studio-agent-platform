@@ -45,11 +45,15 @@ export function Attendance() {
 
   if (query.isError) {
     const err = query.error;
-    if (err instanceof HubApiResponseError && err.status === 503) {
+    if (err instanceof HubApiResponseError && (err.status === 503 || err.status === 401)) {
       return (
         <EmptyState
-          title="Attendance setup still completing"
-          body="The live attendance feed is wired, but the final runtime configuration is still being completed in this environment."
+          title={err.status === 401 ? 'Attendance auth still completing' : 'Attendance setup still completing'}
+          body={
+            err.status === 401
+              ? 'The page is live, but the dashboard still needs a valid delegated token before attendance data can load. Once tenant consent is granted, this view should populate normally.'
+              : 'The live attendance feed is wired, but the final runtime configuration is still being completed in this environment.'
+          }
         />
       );
     }
