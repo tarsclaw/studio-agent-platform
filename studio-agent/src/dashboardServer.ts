@@ -19,17 +19,17 @@
  *   Not set → no CORS headers (safe default for server-side-only access).
  */
 
-import express from "express";
+import express, { type Express } from "express";
 import chatRouter from "./chatProxy";
 import attendanceRouter from "./attendanceProxy";
 import holidayAllowanceRouter from "./holidayAllowanceProxy";
 import leaveRouter from "./leaveProxy";
 
-export function startDashboardServer(): void {
+export function startDashboardServer(hostApp?: Express): void {
   const port = Number(process.env.DASHBOARD_PORT) || 3979;
   const allowedOrigin = process.env.DASHBOARD_ALLOWED_ORIGIN ?? "";
 
-  const app = express();
+  const app = hostApp ?? express();
 
   // Parse JSON bodies up to 1 MB
   app.use(express.json({ limit: "1mb" }));
@@ -58,7 +58,12 @@ export function startDashboardServer(): void {
   app.use("/api/holiday-allowances", holidayAllowanceRouter);
   app.use("/api/leave-requests", leaveRouter);
 
-  // Catch-all 404
+  if (hostApp) {
+    console.log(`[Dashboard API] Mounted on main app listener`);
+    return;
+  }
+
+  // Catch-all 404 only when serving the dashboard API as its own server.
   app.use((_req, res) => {
     res.status(404).json({ error: "not_found" });
   });

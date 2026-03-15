@@ -31,10 +31,11 @@ normalizeBotEnv();
 initTelemetry();
 
 (async () => {
+  // Mount dashboard API routes onto the main Express listener before starting the bot/app.
+  // This makes /api/chat and related routes reachable on the public App Service host,
+  // instead of an internal side port that Azure does not expose.
+  startDashboardServer((app as any).http.express as any);
+
   await app.start();
   console.log(`Bot started, app listening on`, process.env.PORT || process.env.port || 3978);
-
-  // Start dashboard API server in the same process on DASHBOARD_PORT (default 3979).
-  // The Teams relay is untouched — each server manages its own port and concerns.
-  startDashboardServer();
 })();
