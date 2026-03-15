@@ -15,6 +15,7 @@ import { EmptyState } from '../shared/EmptyState';
 import { ErrorState } from '../shared/ErrorState';
 import { LoadingSkeleton } from '../shared/LoadingSkeleton';
 import type { AttendanceGroupCounts } from '../../api/types';
+import { getAttendanceAlerts, getCompanySummaries } from '../../lib/attendanceSelectors';
 
 function GroupList({ title, groups }: { title: string; groups: Record<string, AttendanceGroupCounts> }) {
   const entries = Object.entries(groups).sort((a, b) => (b[1].present + b[1].absent) - (a[1].present + a[1].absent));
@@ -78,6 +79,8 @@ export function AttendanceWidget() {
 
   const absences = data.absences ?? [];
   const presenceRate = data.totalEmployees > 0 ? Math.round((data.totalPresent / data.totalEmployees) * 100) : 0;
+  const companySummaries = getCompanySummaries(data).slice(0, 4);
+  const alerts = getAttendanceAlerts(data);
 
   return (
     <section className="card p-6">
@@ -103,25 +106,25 @@ export function AttendanceWidget() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] p-4">
+        <div className="rounded-[24px] border border-[var(--border-primary)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.96))] p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]"><Users size={16} /> Total team</div>
           <div className="mt-3 font-mono text-3xl font-bold text-[var(--text-primary)]">{data.totalEmployees}</div>
         </div>
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[linear-gradient(135deg,rgba(16,185,129,0.12),rgba(255,255,255,1))] p-4">
+        <div className="rounded-[24px] border border-[var(--border-primary)] bg-[linear-gradient(135deg,rgba(16,185,129,0.12),rgba(255,255,255,1))] p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]"><UserRoundCheck size={16} className="text-[var(--brand-primary)]" /> In today</div>
           <div className="mt-3 font-mono text-3xl font-bold text-[var(--brand-primary)]">{data.totalPresent}</div>
         </div>
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[linear-gradient(135deg,rgba(245,158,11,0.12),rgba(255,255,255,1))] p-4">
+        <div className="rounded-[24px] border border-[var(--border-primary)] bg-[linear-gradient(135deg,rgba(245,158,11,0.12),rgba(255,255,255,1))] p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]"><UserRoundX size={16} className="text-[var(--color-warning)]" /> Out today</div>
           <div className="mt-3 font-mono text-3xl font-bold text-[var(--color-warning)]">{data.totalAbsent}</div>
         </div>
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] p-4">
+        <div className="rounded-[24px] border border-[var(--border-primary)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.96))] p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
           <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]"><ShieldCheck size={16} /> Presence rate</div>
           <div className="mt-3 font-mono text-3xl font-bold text-[var(--text-primary)]">{presenceRate}%</div>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[1.3fr_0.95fr]">
         <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
             <h4 className="text-sm font-semibold text-[var(--text-primary)]">Today's absences</h4>
@@ -155,7 +158,45 @@ export function AttendanceWidget() {
         </div>
 
         <div className="space-y-4">
-          <GroupList title="By brand" groups={data.byBrand} />
+          <section className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">Brand pulse</h4>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">Quick read of the four companies most relevant to daily staffing review.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {companySummaries.map((company) => (
+                <div key={company.name} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{company.name}</p>
+                  <div className="mt-3 flex items-center justify-between text-sm text-[var(--text-secondary)]">
+                    <span>{company.present} in</span>
+                    <span>{company.absent} out</span>
+                  </div>
+                  <div className="mt-3 h-2 rounded-full bg-[var(--bg-tertiary)]">
+                    <div className="h-2 rounded-full bg-[var(--brand-primary)]" style={{ width: `${Math.max(10, 100 - company.absenceRate)}%` }} />
+                  </div>
+                  <p className="mt-2 text-xs text-[var(--text-tertiary)]">Most impacted team: {company.topDepartment}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] p-4">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+              <ShieldCheck size={14} />
+              <span>Operational signal</span>
+            </div>
+            <div className="space-y-2">
+              {alerts.map((alert) => (
+                <div key={alert.title} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] px-3 py-3">
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{alert.title}</p>
+                  <p className="mt-1 text-xs text-[var(--text-secondary)]">{alert.detail}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <GroupList title="By location" groups={data.byLocation} />
         </div>
       </div>

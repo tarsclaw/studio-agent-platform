@@ -13,8 +13,8 @@ export function AttendanceCompanyCard({ company, active, onClick }: { company: A
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
-            <Building2 size={14} /> Company
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-primary)] bg-white/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
+            <Building2 size={12} /> Company
           </div>
           <h3 className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{company.name}</h3>
         </div>

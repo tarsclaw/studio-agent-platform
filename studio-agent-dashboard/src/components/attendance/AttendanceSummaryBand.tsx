@@ -3,7 +3,13 @@ import type { AttendanceResponse } from '../../api/types';
 
 function Stat({ label, value, icon: Icon, accent }: { label: string; value: string | number; icon: any; accent?: boolean }) {
   return (
-    <div className={`rounded-2xl border border-[var(--border-primary)] p-4 ${accent ? 'bg-[var(--bg-elevated)] shadow-[0_0_0_1px_rgba(16,185,129,0.08)]' : 'bg-[var(--bg-elevated)]'}`}>
+    <div
+      className={`rounded-[24px] border border-[var(--border-primary)] p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)] ${
+        accent
+          ? 'bg-[linear-gradient(135deg,rgba(16,185,129,0.10),rgba(255,255,255,0.96))]'
+          : 'bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.96))]'
+      }`}
+    >
       <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]"><Icon size={16} /> {label}</div>
       <div className={`mt-3 font-mono text-3xl font-bold ${accent ? 'text-[var(--brand-primary)]' : 'text-[var(--text-primary)]'}`}>{value}</div>
     </div>
