@@ -1,4 +1,5 @@
 import {
+  ArrowUpRight,
   Building2,
   Clock3,
   MapPin,
@@ -7,6 +8,7 @@ import {
   UserRoundX,
   Users,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAttendance } from '../../hooks/useAttendance';
 import { HubApiResponseError } from '../../api/hubApi';
 import { EmptyState } from '../shared/EmptyState';
@@ -86,9 +88,17 @@ export function AttendanceWidget() {
             Live Breathe attendance for {data.date}, summarised for admin review across brands, locations, and active absences.
           </p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-3 py-1 text-xs text-[var(--text-tertiary)]">
-          <Clock3 size={12} />
-          Refreshed live from HR
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-3 py-1 text-xs text-[var(--text-tertiary)]">
+            <Clock3 size={12} />
+            Refreshed live from HR
+          </div>
+          <Link
+            to="/dashboard/attendance"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-3 py-1 text-xs text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-secondary)]"
+          >
+            Open attendance view <ArrowUpRight size={12} />
+          </Link>
         </div>
       </div>
 

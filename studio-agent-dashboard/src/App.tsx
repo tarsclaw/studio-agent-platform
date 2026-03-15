@@ -7,6 +7,7 @@ import { Usage } from './pages/Usage';
 import { Performance } from './pages/Performance';
 import { Tools } from './pages/Tools';
 import { BotComparison } from './pages/BotComparison';
+import { Attendance } from './pages/Attendance';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Route path="/dashboard" element={<Shell />}>
         <Route index element={<Navigate to="overview" replace />} />
         <Route path="overview" element={<Overview />} />
+        <Route path="attendance" element={<Attendance />} />
         <Route path="roi" element={<ROI />} />
         <Route path="usage" element={<Usage />} />
         <Route path="performance" element={<Performance />} />
