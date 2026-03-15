@@ -16,6 +16,7 @@
  */
 
 import type { AttendanceResponse, HolidayAllowanceResponse, LeaveResponse } from './types';
+import { getAccessToken } from './auth';
 
 const HUB_BASE: string = (import.meta.env.VITE_HUB_API_BASE as string | undefined) ?? '';
 
@@ -49,10 +50,12 @@ export class HubApiResponseError extends Error {
 }
 
 async function hubFetch<T>(path: string, init: RequestInit): Promise<T> {
+  const token = await getAccessToken();
   const res = await fetch(`${HUB_BASE}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init.headers,
     },
   });
