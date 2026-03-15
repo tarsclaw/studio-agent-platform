@@ -1,4 +1,4 @@
-import { acquireAccessToken, getActiveAccount, loginWithMsal, msalEnabled } from '../msalConfig';
+import { acquireAccessToken, getActiveAccount, getMsalApp, loginWithMsal, msalEnabled } from '../msalConfig';
 
 export interface User {
   name: string;
@@ -27,13 +27,14 @@ export async function ensureDashboardLogin(): Promise<void> {
   if (LOCAL_AUTH_BYPASS) return;
   if (msalEnabled) {
     const token = await acquireAccessToken();
-    if (token) return;
+    if (!token) throw new Error('msal_login_redirect_started');
     return;
   }
 
   const user = await getUser();
   if (!user) {
     window.location.href = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
+    throw new Error('swa_login_redirect_started');
   }
 }
 
@@ -41,6 +42,15 @@ export async function getAccessToken(): Promise<string | null> {
   if (LOCAL_AUTH_BYPASS) return null;
   if (!msalEnabled) return null;
   return acquireAccessToken();
+}
+
+export async function clearMsalSession(): Promise<void> {
+  if (!msalEnabled) return;
+  const msal = await getMsalApp();
+  const account = await getActiveAccount();
+  if (msal && account) {
+    await msal.logoutRedirect({ account, postLogoutRedirectUri: window.location.origin });
+  }
 }
 
 export async function getUser(): Promise<User | null> {

@@ -16,7 +16,7 @@
  */
 
 import type { AttendanceResponse, HolidayAllowanceResponse, LeaveResponse } from './types';
-import { getAccessToken } from './auth';
+import { ensureDashboardLogin, getAccessToken } from './auth';
 
 const HUB_BASE: string = (import.meta.env.VITE_HUB_API_BASE as string | undefined) ?? '';
 
@@ -50,7 +50,14 @@ export class HubApiResponseError extends Error {
 }
 
 async function hubFetch<T>(path: string, init: RequestInit): Promise<T> {
+  await ensureDashboardLogin();
   const token = await getAccessToken();
+  if (!token) {
+    throw new HubApiResponseError(401, {
+      error: 'missing_token',
+      message: 'A valid dashboard access token is required before calling Studio Agent.',
+    });
+  }
   const res = await fetch(`${HUB_BASE}${path}`, {
     ...init,
     headers: {
