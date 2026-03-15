@@ -4,7 +4,9 @@ import { useAttendance } from '../hooks/useAttendance';
 import { AttendanceAbsencePreview } from '../components/attendance/AttendanceAbsencePreview';
 import { AttendanceAlertsPanel } from '../components/attendance/AttendanceAlertsPanel';
 import { AttendanceCompanyCard } from '../components/attendance/AttendanceCompanyCard';
+import { AttendanceCompanyDetail } from '../components/attendance/AttendanceCompanyDetail';
 import { AttendanceDepartmentBoard } from '../components/attendance/AttendanceDepartmentBoard';
+import { AttendanceDepartmentMode } from '../components/attendance/AttendanceDepartmentMode';
 import { AttendanceModeSwitch, type AttendanceMode } from '../components/attendance/AttendanceModeSwitch';
 import { AttendanceSummaryBand } from '../components/attendance/AttendanceSummaryBand';
 import { EmptyState } from '../components/shared/EmptyState';
@@ -144,37 +146,16 @@ export function Attendance() {
               <AttendanceCompanyCard key={company.name} company={company} active={company.name === model.selectedCompany?.name} onClick={() => setSelectedCompany(company.name)} />
             ))}
           </section>
-          {model.selectedCompany ? (
-            <section className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] p-6">
-              <h2 className="text-xl font-semibold text-[var(--text-primary)]">{model.selectedCompany.name}</h2>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">Deep company view with strongest current signals and absence roster preview.</p>
-              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
-                  <p className="text-xs uppercase tracking-wide text-[var(--text-tertiary)]">In today</p>
-                  <p className="mt-2 font-mono text-3xl font-semibold text-[var(--brand-primary)]">{model.selectedCompany.present}</p>
-                </div>
-                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
-                  <p className="text-xs uppercase tracking-wide text-[var(--text-tertiary)]">Out today</p>
-                  <p className="mt-2 font-mono text-3xl font-semibold text-[var(--color-warning)]">{model.selectedCompany.absent}</p>
-                </div>
-                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
-                  <p className="text-xs uppercase tracking-wide text-[var(--text-tertiary)]">Most impacted team</p>
-                  <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{model.selectedCompany.topDepartment}</p>
-                </div>
-              </div>
-              <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-                <AttendanceAlertsPanel alerts={model.alerts.filter((alert) => alert.title.toLowerCase().includes(model.selectedCompany!.name.toLowerCase()) || alert.title.toLowerCase().includes('highest absence'))} />
-                <AttendanceAbsencePreview absences={query.data.absences.filter((item) => item.brand === model.selectedCompany?.name)} />
-              </div>
-            </section>
-          ) : null}
+          {model.selectedCompany ? <AttendanceCompanyDetail company={model.selectedCompany} data={query.data} /> : null}
         </div>
       )}
 
-      {(mode === 'department' || mode === 'people') && (
+      {mode === 'department' && <AttendanceDepartmentMode departments={model.departments} />}
+
+      {mode === 'people' && (
         <EmptyState
-          title={`${mode === 'department' ? 'Department' : 'People'} mode is next in the build queue`}
-          body="This first implementation slice prioritises the route, summary, overview, and company drill-down experience. Department and people modes are planned next."
+          title="People mode is next in the build queue"
+          body="The next tranche will add a searchable people roster with company, department, location, and status filtering."
         />
       )}
     </div>
