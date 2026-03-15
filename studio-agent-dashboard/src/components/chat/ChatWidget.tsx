@@ -19,10 +19,10 @@ import {
 import { hubApi, HubApiResponseError, type ChatMessage } from '../../api/hubApi';
 
 const PLACEHOLDER_PROMPTS = [
-  'Show me all pending leave requests.',
-  'Who is out of the studio today?',
-  'List employees in the Chelsea studio.',
-  'How many holiday days do we get?',
+  'What needs my attention today across the studios?',
+  'Are any teams under staffing pressure today?',
+  'Give me a company-wide attendance summary.',
+  'Any urgent leave or operational issues I should know about?',
 ];
 
 function StudioAgentMark({ compact = false }: { compact?: boolean }) {
@@ -47,7 +47,7 @@ function EmptyState({ onSelect }: { onSelect: (text: string) => void }) {
         <div className="min-w-0">
           <p className="text-sm font-semibold text-[var(--text-primary)]">Admin assistant, ready</p>
           <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
-            Use Studio Agent for live HR checks, leave operations, attendance questions, and quick policy guidance.
+            Use Studio Agent for a fast leadership readout across attendance, leave pressure, and operational risks.
           </p>
         </div>
       </div>
@@ -194,7 +194,7 @@ export function ChatWidget() {
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                    Premium admin access for attendance, leave, and operations support.
+                    Leadership support for attendance, leave pressure, and what needs attention today.
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
