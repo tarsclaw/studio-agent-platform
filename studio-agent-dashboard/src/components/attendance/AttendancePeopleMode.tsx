@@ -27,13 +27,13 @@ export function AttendancePeopleMode({ people }: { people: AttendancePersonSumma
             <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">People mode</h2>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">Search across the current absence roster by person, company, team, or location.</p>
           </div>
-          <label className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] px-3 py-2 text-sm text-[var(--text-tertiary)]">
+          <label className="inline-flex w-full items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] px-3 py-2 text-sm text-[var(--text-tertiary)] sm:w-auto">
             <Search size={14} />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search people or studio"
-              className="bg-transparent outline-none placeholder:text-[var(--text-tertiary)]"
+              className="w-full bg-transparent outline-none placeholder:text-[var(--text-tertiary)] sm:w-auto"
             />
           </label>
         </div>

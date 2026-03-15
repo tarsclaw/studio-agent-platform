@@ -30,7 +30,7 @@ export function AttendanceCompanyDetail({ company, data }: { company: Attendance
             Focused attendance breakdown for {company.name}, including the most affected teams, office concentration, and the current absence roster.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-3 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
+        <div className="grid grid-cols-1 gap-3 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4 sm:grid-cols-3">
           <div>
             <p className="text-xs uppercase tracking-wide text-[var(--text-tertiary)]">In</p>
             <p className="mt-2 inline-flex items-center gap-1 font-mono text-2xl font-semibold text-[var(--brand-primary)]"><UserRoundCheck size={14} /> {company.present}</p>
