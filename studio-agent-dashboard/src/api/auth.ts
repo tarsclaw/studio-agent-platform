@@ -59,7 +59,6 @@ export async function getUser(): Promise<User | null> {
   if (msalEnabled) {
     const user = await getUserFromMsal();
     if (user) return user;
-    await loginWithMsal();
     return null;
   }
 
