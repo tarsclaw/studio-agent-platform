@@ -34,14 +34,12 @@ export async function ensureDashboardLogin(): Promise<void> {
       throw new Error('msal_interaction_in_progress');
     }
 
-    await loginWithMsal();
-    throw new Error('msal_login_redirect_started');
+    throw new Error('msal_login_required');
   }
 
   const user = await getUser();
   if (!user) {
-    window.location.href = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
-    throw new Error('swa_login_redirect_started');
+    throw new Error('swa_login_required');
   }
 }
 
@@ -65,7 +63,7 @@ export async function getUser(): Promise<User | null> {
 
   if (msalEnabled) {
     const user = await getUserFromMsal();
-    return user;
+    if (user) return user;
   }
 
   try {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ensureDashboardLogin, getUser, type User } from '../api/auth';
+import { getUser, type User } from '../api/auth';
 
 interface AuthState {
   user: User;
@@ -17,8 +17,7 @@ export function useAuth() {
   useEffect(() => {
     let active = true;
 
-    ensureDashboardLogin()
-      .then(() => getUser())
+    getUser()
       .then((user) => {
         if (!active) return;
         setState({ user: user ?? devUser, loading: false });
