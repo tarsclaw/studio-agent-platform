@@ -4,8 +4,14 @@ import type { User } from '../../api/auth';
 import { ROUTE_META } from '../../lib/constants';
 import { PeriodSelector } from './PeriodSelector';
 
-export function TopBar({ user }: { user: User }) {
+const fallbackUser: User = {
+  name: 'Studio User',
+  email: 'Sign-in required',
+};
+
+export function TopBar({ user }: { user: User | null }) {
   const { pathname } = useLocation();
+  const displayUser = user ?? fallbackUser;
   const current = ROUTE_META[pathname] || ROUTE_META['/dashboard'];
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -40,7 +46,7 @@ export function TopBar({ user }: { user: User }) {
               aria-haspopup="menu"
               aria-expanded={menuOpen}
             >
-              {user.name.charAt(0).toUpperCase()}
+              {displayUser.name.charAt(0).toUpperCase()}
             </button>
 
             {menuOpen && (
@@ -48,8 +54,8 @@ export function TopBar({ user }: { user: User }) {
                 className="absolute right-0 mt-2 w-56 rounded-md border border-[var(--border-primary)] bg-[var(--bg-elevated)] p-3 shadow-[var(--shadow-md)]"
                 role="menu"
               >
-                <p className="text-sm font-medium text-[var(--text-primary)]">{user.name}</p>
-                <p className="truncate text-xs text-[var(--text-tertiary)]">{user.email}</p>
+                <p className="text-sm font-medium text-[var(--text-primary)]">{displayUser.name}</p>
+                <p className="truncate text-xs text-[var(--text-tertiary)]">{displayUser.email}</p>
                 <a
                   href="/.auth/logout"
                   className="mt-3 inline-flex text-xs text-[var(--text-secondary)] transition-colors hover:text-[var(--color-error)]"

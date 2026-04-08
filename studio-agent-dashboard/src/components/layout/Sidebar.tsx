@@ -12,6 +12,11 @@ import { NavLink } from 'react-router-dom';
 import type { User } from '../../api/auth';
 import { Wordmark } from '../shared/Wordmark';
 
+const fallbackUser: User = {
+  name: 'Studio User',
+  email: 'Sign-in required',
+};
+
 const navItems = [
   { to: '/dashboard/overview', label: 'Overview', icon: LayoutDashboard },
   { to: '/dashboard/attendance', label: 'Attendance', icon: CalendarDays },
@@ -22,7 +27,9 @@ const navItems = [
   { to: '/dashboard/bots', label: 'Employee vs Admin', icon: GitCompare },
 ];
 
-export function Sidebar({ user }: { user: User }) {
+export function Sidebar({ user }: { user: User | null }) {
+  const displayUser = user ?? fallbackUser;
+
   return (
     <aside className="fixed left-0 top-0 flex h-screen w-[240px] flex-col border-r border-[var(--border-primary)] bg-[var(--bg-primary)] px-4 py-6">
       <Wordmark size="sm" className="px-2" />
@@ -56,8 +63,8 @@ export function Sidebar({ user }: { user: User }) {
       <div className="mt-auto">
         <div className="mb-4 h-px bg-[var(--border-subtle)]" />
         <div className="px-2">
-          <p className="text-sm font-medium text-[var(--text-primary)]">{user.name}</p>
-          <p className="truncate text-xs text-[var(--text-tertiary)]">{user.email}</p>
+          <p className="text-sm font-medium text-[var(--text-primary)]">{displayUser.name}</p>
+          <p className="truncate text-xs text-[var(--text-tertiary)]">{displayUser.email}</p>
           <a
             className="mt-3 inline-flex items-center gap-1 text-xs text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-error)]"
             href="/.auth/logout"

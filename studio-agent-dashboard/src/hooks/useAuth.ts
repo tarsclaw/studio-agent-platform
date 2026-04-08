@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react';
 import { ensureDashboardLogin, getUser, type User } from '../api/auth';
 
 interface AuthState {
-  user: User;
+  user: User | null;
   loading: boolean;
 }
 
-const devUser: User = { name: 'Dev User', email: 'dev@local' };
-
 export function useAuth() {
   const [state, setState] = useState<AuthState>({
-    user: devUser,
+    user: null,
     loading: true,
   });
 
@@ -21,11 +19,11 @@ export function useAuth() {
       .then(() => getUser())
       .then((user) => {
         if (!active) return;
-        setState({ user: user ?? devUser, loading: false });
+        setState({ user, loading: false });
       })
       .catch(() => {
         if (!active) return;
-        setState({ user: devUser, loading: false });
+        setState({ user: null, loading: false });
       });
 
     return () => {
