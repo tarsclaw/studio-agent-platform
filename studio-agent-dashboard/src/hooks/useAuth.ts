@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { getUser, type User } from '../api/auth';
 
+const SWA_LOGIN_PATH = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
+
 interface AuthState {
   user: User;
   loading: boolean;
@@ -20,11 +22,15 @@ export function useAuth() {
     getUser()
       .then((user) => {
         if (!active) return;
-        setState({ user: user ?? devUser, loading: false });
+        if (!user) {
+          window.location.assign(SWA_LOGIN_PATH);
+          return;
+        }
+        setState({ user, loading: false });
       })
       .catch(() => {
         if (!active) return;
-        setState({ user: devUser, loading: false });
+        window.location.assign(SWA_LOGIN_PATH);
       });
 
     return () => {
