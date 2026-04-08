@@ -29,7 +29,8 @@
  *   authenticated dashboard user resolves to role=admin.
  *
  * Auth dependency
- *   Blocked on AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID (John Jobling / Allect IT).
+ *   Requires deployed AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID values that match
+ *   the consented dashboard Entra app registration.
  *   requireMsalAuth returns 503 with a clear message until those are set.
  */
 

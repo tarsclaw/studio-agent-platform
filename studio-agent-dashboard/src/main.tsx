@@ -6,6 +6,17 @@ import App from './App';
 import './index.css';
 import { PeriodProvider } from './hooks/usePeriod';
 
+if (typeof window !== 'undefined') {
+  (window as any).__STUDIO_AGENT_ENV__ = {
+    hubApiBase: import.meta.env.VITE_HUB_API_BASE ?? '',
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
+    azureAdClientId: import.meta.env.VITE_AZURE_AD_CLIENT_ID ?? '',
+    azureAdTenantId: import.meta.env.VITE_AZURE_AD_TENANT_ID ?? '',
+    azureAdApiScope: import.meta.env.VITE_AZURE_AD_API_SCOPE ?? '',
+    azureAdRedirectUri: import.meta.env.VITE_AZURE_AD_REDIRECT_URI ?? '',
+  };
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

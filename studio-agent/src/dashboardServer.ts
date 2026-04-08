@@ -14,8 +14,8 @@
  *   GET  /api/attendance   — HR attendance data from Breathe HR
  *
  * CORS
- *   Set DASHBOARD_ALLOWED_ORIGIN to your dashboard's origin
- *   (e.g. https://studio-agent-dashboard.azurestaticapps.net) to enable CORS.
+ *   Set DASHBOARD_ALLOWED_ORIGIN to your dashboard origin
+ *   (for example https://mystudioagent.ai) to enable browser access.
  *   Not set → no CORS headers (safe default for server-side-only access).
  */
 

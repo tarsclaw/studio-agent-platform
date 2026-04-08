@@ -9,7 +9,9 @@ import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
+  ExternalLink,
   Loader2,
+  Mail,
   RotateCcw,
   Send,
   ShieldCheck,
@@ -42,6 +44,20 @@ function StudioAgentMark({ compact = false }: { compact?: boolean }) {
 function EmptyState({ onSelect }: { onSelect: (text: string) => void }) {
   return (
     <div className="flex flex-col gap-5 py-5">
+      <div className="rounded-2xl border border-amber-200/80 bg-[linear-gradient(135deg,rgba(251,191,36,0.12),rgba(255,255,255,0.94))] px-4 py-4 text-sm text-[var(--text-secondary)] shadow-[var(--shadow-sm)]">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 rounded-xl bg-amber-100 p-2 text-amber-700">
+            <Mail size={16} />
+          </div>
+          <div>
+            <p className="font-semibold text-[var(--text-primary)]">Signed-in Studio Agent access is ready to finish configuring</p>
+            <p className="mt-1 leading-relaxed">
+              Admin consent has been granted. The widget and attendance flows now depend on the dashboard being pointed at the correct Entra app and deployed runtime config.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="flex items-start gap-3 rounded-2xl border border-[var(--border-primary)] bg-[linear-gradient(135deg,rgba(16,185,129,0.10),rgba(255,255,255,0.95))] px-4 py-4">
         <StudioAgentMark />
         <div className="min-w-0">
@@ -101,9 +117,32 @@ function Bubble({ message }: { message: ChatMessage }) {
 
 function StatusBanner({ status }: { status: 503 | 401 | 'error' | null }) {
   if (!status) return null;
+
+  if (status === 503) {
+    return (
+      <div className="space-y-3 rounded-2xl border border-amber-300/70 bg-[linear-gradient(135deg,rgba(251,191,36,0.12),rgba(255,255,255,0.96))] px-3.5 py-3 text-xs text-[var(--text-primary)] shadow-[var(--shadow-sm)]">
+        <div className="flex items-start gap-2">
+          <AlertCircle size={14} className="mt-0.5 flex-shrink-0 text-amber-600" />
+          <div>
+            <p className="font-semibold text-[var(--text-primary)]">Dashboard auth configuration still needs updating</p>
+            <p className="mt-1 leading-relaxed text-[var(--text-secondary)]">
+              The widget UI is live, but authenticated Studio Agent actions are blocked until the deployed dashboard and API are both pointed at the consented Entra app.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-white/70 bg-white/80 px-3 py-2.5 text-[11px] leading-relaxed text-[var(--text-secondary)]">
+          <p className="font-semibold text-[var(--text-primary)]">Needed in deployment config</p>
+          <p className="mt-1">
+            Update the live frontend and backend environment variables so both use the same consented Studio Agent Dashboard Entra app registration.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const messages: Record<string, string> = {
-    503: 'Studio Agent is waiting on dashboard auth or agent configuration before chat can complete.',
-    401: 'Your dashboard session expired — refresh and try again.',
+    401: 'Your dashboard sign-in expired. Refresh and sign in again to continue.',
     error: 'Something went wrong while contacting Studio Agent. Please retry.',
   };
   return (
@@ -196,6 +235,14 @@ export function ChatWidget() {
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">
                     Leadership support for attendance, leave pressure, and what needs attention today.
                   </p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+                    <span className="rounded-full border border-white/70 bg-white/80 px-2.5 py-1 font-medium text-[var(--text-secondary)]">
+                      Widget live
+                    </span>
+                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
+                      Entra consent granted
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-1">
                   {conversationId && (
@@ -246,6 +293,24 @@ export function ChatWidget() {
             {bannerStatus && (
               <div className="px-5 pb-3">
                 <StatusBanner status={bannerStatus} />
+              </div>
+            )}
+
+            {!bannerStatus && messages.length === 0 && (
+              <div className="px-5 pb-3">
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
+                  <div>
+                    <span className="font-semibold text-[var(--text-primary)]">Next unblock:</span> deploy the updated Entra app config so the widget uses the newly consented dashboard app.
+                  </div>
+                  <a
+                    href="https://entra.microsoft.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-primary)] bg-white px-2 py-1 font-medium text-[var(--text-primary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+                  >
+                    Entra <ExternalLink size={12} />
+                  </a>
+                </div>
               </div>
             )}
 

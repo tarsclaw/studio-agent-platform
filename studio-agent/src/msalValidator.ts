@@ -6,14 +6,14 @@
  *
  * DEPENDENCY STATUS
  * -----------------
- * AZURE_AD_TENANT_ID  — awaiting Azure AD App Registration (John Jobling / Allect IT)
- * AZURE_AD_CLIENT_ID  — awaiting Azure AD App Registration (John Jobling / Allect IT)
+ * Requires deployed AZURE_AD_TENANT_ID and AZURE_AD_CLIENT_ID values that match
+ * the active Microsoft Entra dashboard app registration.
  *
  * If either env var is absent the middleware returns 503 with a clear, honest
- * reason.  Requests are NEVER passed through unauthenticated.
+ * reason. Requests are NEVER passed through unauthenticated.
  *
- * When the App Registration is provisioned, set both env vars and token
- * validation activates automatically — no code change required.
+ * When the deployed env vars match the consented app registration, token
+ * validation activates automatically with no code change required.
  *
  * Validation approach
  * -------------------
@@ -56,6 +56,7 @@ export interface AuthenticatedRequest extends Request {
     tid: string;    // Tenant ID
     name?: string;
     email?: string;
+    role?: 'employee' | 'admin';
   };
 }
 
@@ -63,17 +64,36 @@ export interface AuthenticatedRequest extends Request {
 // Middleware
 // -------------------------
 
+function normalizeCsv(value?: string): string[] {
+  return (value || '')
+    .split(',')
+    .map((v) => v.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function resolveDashboardRole(oid?: string, email?: string): 'employee' | 'admin' {
+  if (process.env.DASHBOARD_FORCE_ADMIN === 'true') return 'admin';
+  const adminOids = normalizeCsv(process.env.DASHBOARD_ADMIN_OIDS);
+  const adminEmails = normalizeCsv(process.env.DASHBOARD_ADMIN_EMAILS);
+  if (oid && adminOids.includes(oid.toLowerCase())) return 'admin';
+  if (email && adminEmails.includes(email.toLowerCase())) return 'admin';
+  return 'employee';
+}
+
 export function requireMsalAuth(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): void {
   if (process.env.DASHBOARD_DEV_AUTH_BYPASS === "true") {
+    const email = process.env.DASHBOARD_DEV_EMAIL || "dev@local";
+    const oid = process.env.DASHBOARD_DEV_OID || "local-dev-user";
     req.auth = {
-      oid: process.env.DASHBOARD_DEV_OID || "local-dev-user",
+      oid,
       tid: process.env.AZURE_AD_TENANT_ID || "local-dev-tenant",
       name: process.env.DASHBOARD_DEV_NAME || "Local Dev User",
-      email: process.env.DASHBOARD_DEV_EMAIL || "dev@local",
+      email,
+      role: resolveDashboardRole(oid, email),
     };
     next();
     return;
@@ -87,9 +107,8 @@ export function requireMsalAuth(
       error: "dashboard_auth_not_configured",
       message:
         "Dashboard authentication is not yet configured. " +
-        "Awaiting Azure AD App Registration credentials " +
-        "(AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID env vars). " +
-        "Contact Allect IT (John Jobling) to provision the App Registration.",
+        "Set deployed AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID values for the " +
+        "same Entra app registration that has dashboard consent.",
     });
     return;
   }
@@ -147,11 +166,13 @@ export function requireMsalAuth(
         return;
       }
 
+      const email = claims.preferred_username ?? claims.upn;
       req.auth = {
         oid,
         tid,
         name: claims.name,
-        email: claims.preferred_username ?? claims.upn,
+        email,
+        role: resolveDashboardRole(oid, email),
       };
 
       next();

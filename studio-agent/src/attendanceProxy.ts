@@ -23,7 +23,7 @@
  *
  * DEPENDENCY STATUS
  * -----------------
- * AZURE_AD_TENANT_ID / AZURE_AD_CLIENT_ID  — blocks auth (John Jobling / Allect IT)
+ * AZURE_AD_TENANT_ID / AZURE_AD_CLIENT_ID  — must match the consented dashboard Entra app
  * BREATHE_API_KEY_READONLY                 — preferred; pending from Tracey/Allect
  * BREATHE_API_KEY                          — sandbox key available as fallback
  *
@@ -110,9 +110,13 @@ function brandFromEmail(email?: string): string {
   return DOMAIN_TO_BRAND[domain] ?? "Allect";
 }
 
-function displayLocation(raw?: string): string {
+function displayLocation(raw?: unknown): string {
   if (!raw) return "Unknown";
-  return LOCATION_DISPLAY[raw] ?? raw;
+  const value = typeof raw === 'object' ? (raw as any)?.name ?? (raw as any)?.label ?? '' : raw;
+  if (typeof value !== 'string') return String(value || 'Unknown');
+  const trimmed = value.trim();
+  if (!trimmed) return 'Unknown';
+  return LOCATION_DISPLAY[trimmed] ?? trimmed;
 }
 
 // -------------------------
@@ -122,27 +126,40 @@ function displayLocation(raw?: string): string {
 // GET-only by construction.  Path is validated against the allowlist before
 // any network request is made.
 
+function resolveBreatheHost(apiKey: string): string {
+  if (process.env.BREATHE_BASE_URL) {
+    try {
+      return new URL(process.env.BREATHE_BASE_URL).hostname;
+    } catch {
+      return process.env.BREATHE_BASE_URL.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+    }
+  }
+  return apiKey.startsWith('sandbox-') ? 'api.sandbox.breathehr.info' : 'api.breathehr.com';
+}
+
 function breatheGet(path: string, apiKey: string): Promise<unknown> {
   // Enforce allowlist before touching the network
   assertAllowedBreathePath(path);
 
+  const hostname = resolveBreatheHost(apiKey);
+
   // Strip query string for log output so no sensitive filter values appear
   const pathForLog = path.split("?")[0];
-  console.log(`[attendanceProxy] → GET ${pathForLog}`);
+  console.log(`[attendanceProxy] → GET ${hostname}${pathForLog}`);
 
   return new Promise((resolve, reject) => {
     const req = https.request(
       {
-        hostname: "api.breathehr.com",
+        hostname,
         path,
         method: "GET",          // hard-coded; never derived from caller input
         headers: {
-          "api-key": apiKey,    // key is never logged
+          "X-API-KEY": apiKey,   // key is never logged
           Accept: "application/json",
         },
       },
       (res) => {
-        console.log(`[attendanceProxy] ← ${res.statusCode} ${pathForLog}`);
+        console.log(`[attendanceProxy] ← ${res.statusCode} ${hostname}${pathForLog}`);
         let raw = "";
         res.on("data", (chunk: Buffer) => (raw += chunk.toString()));
         res.on("end", () => {
@@ -244,11 +261,17 @@ router.get(
       const absenceRecords = absences.map((a: any) => {
         const emp = employees.find((e: any) => e.id === a.employee?.id);
         return {
-          employeeName: a.employee?.full_name ?? "Unknown",
+          employeeName:
+            a.employee?.full_name ??
+            [emp?.first_name, emp?.last_name].filter(Boolean).join(' ').trim() ??
+            emp?.name ??
+            'Unknown',
           type: a.absence_type?.name ?? a.reason ?? "Absence",
           brand: brandFromEmail(emp?.email),
-          location: displayLocation(emp?.location),
-          department: emp?.department?.name ?? "Unknown",
+          location: displayLocation(emp?.location ?? a.employee?.location),
+          department:
+            emp?.department?.name ??
+            (typeof emp?.department === 'string' ? emp.department : 'Unknown'),
           startDate: a.start_date,
           endDate: a.end_date,
         };

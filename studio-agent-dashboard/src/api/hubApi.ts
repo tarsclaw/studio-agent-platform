@@ -11,7 +11,8 @@
  * Auth
  *   Requests include Authorization: Bearer <token> when a token is available.
  *   The backend returns 503 (auth not yet configured) or 401 (invalid token)
- *   until AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID are set (John Jobling / Allect IT).
+ *   until the deployed backend has matching AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID
+ *   for the consented dashboard app registration.
  *   The UI handles both states gracefully rather than crashing.
  */
 
