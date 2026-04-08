@@ -34,9 +34,6 @@ async function fetchDashboard<T>(endpoint: string, params?: Record<string, strin
   const res = await fetch(url.toString());
 
   if (res.status === 401) {
-    if (!LOCAL_AUTH_BYPASS) {
-      window.location.href = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
-    }
     throw new Error('Unauthorized');
   }
 
