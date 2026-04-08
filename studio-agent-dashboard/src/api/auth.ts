@@ -1,4 +1,4 @@
-import { acquireAccessToken, getActiveAccount, getMsalApp, isMsalInteractionInProgress, loginWithMsal, msalEnabled } from '../msalConfig';
+import { acquireAccessToken, getActiveAccount, getMsalApp, msalEnabled } from '../msalConfig';
 
 export interface User {
   name: string;
@@ -25,28 +25,18 @@ async function getUserFromMsal(): Promise<User | null> {
 
 export async function ensureDashboardLogin(): Promise<void> {
   if (LOCAL_AUTH_BYPASS) return;
-  if (msalEnabled) {
-    const user = await getUserFromMsal();
-    if (user) return;
-
-    const interactionInProgress = await isMsalInteractionInProgress();
-    if (interactionInProgress) {
-      throw new Error('msal_interaction_in_progress');
-    }
-
-    throw new Error('msal_login_required');
-  }
-
   const user = await getUser();
   if (!user) {
-    throw new Error('swa_login_required');
+    throw new Error('dashboard_login_required');
   }
 }
 
 export async function getAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
   if (LOCAL_AUTH_BYPASS) return null;
   if (!msalEnabled) return null;
-  return acquireAccessToken(options);
+  const user = await getUser();
+  if (!user) return null;
+  return acquireAccessToken({ ...options, interactive: false });
 }
 
 export async function clearMsalSession(): Promise<void> {
@@ -60,11 +50,6 @@ export async function clearMsalSession(): Promise<void> {
 
 export async function getUser(): Promise<User | null> {
   if (LOCAL_AUTH_BYPASS) return devUser();
-
-  if (msalEnabled) {
-    const user = await getUserFromMsal();
-    if (user) return user;
-  }
 
   try {
     const res = await fetch('/.auth/me');
