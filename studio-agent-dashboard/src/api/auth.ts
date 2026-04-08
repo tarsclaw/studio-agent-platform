@@ -26,9 +26,10 @@ async function getUserFromMsal(): Promise<User | null> {
 export async function ensureDashboardLogin(): Promise<void> {
   if (LOCAL_AUTH_BYPASS) return;
   if (msalEnabled) {
-    const token = await acquireAccessToken();
-    if (!token) throw new Error('msal_login_redirect_started');
-    return;
+    const user = await getUserFromMsal();
+    if (user) return;
+    await loginWithMsal();
+    throw new Error('msal_login_redirect_started');
   }
 
   const user = await getUser();
