@@ -21,8 +21,21 @@ export function useAuth() {
         if (!active) return;
         setState({ user, loading: false });
       })
-      .catch(() => {
+      .catch((error) => {
         if (!active) return;
+
+        const message = error instanceof Error ? error.message : '';
+        const authStillLoading =
+          message === 'msal_interaction_in_progress' ||
+          message === 'msal_login_pending' ||
+          message === 'msal_login_redirect_started' ||
+          message === 'swa_login_redirect_started';
+
+        if (authStillLoading) {
+          setState((current) => ({ ...current, loading: true }));
+          return;
+        }
+
         setState({ user: null, loading: false });
       });
 

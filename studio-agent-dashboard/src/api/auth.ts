@@ -77,7 +77,10 @@ export async function getAccessToken(options?: { interactive?: boolean }): Promi
 }
 
 export async function clearMsalSession(): Promise<void> {
-  return;
+  if (!msalEnabled) return;
+  try {
+    sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+  } catch {}
 }
 
 export async function getUser(): Promise<User | null> {

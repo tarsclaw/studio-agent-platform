@@ -20,7 +20,7 @@ function lastThirtyDaysRange() {
 }
 
 export function Shell() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [minimumElapsed, setMinimumElapsed] = useState(false);
   const [maxElapsed, setMaxElapsed] = useState(false);
 
@@ -37,7 +37,8 @@ export function Shell() {
     };
   }, []);
 
-  const ready = minimumElapsed && (summary.isSuccess || maxElapsed) && (trends.isSuccess || maxElapsed);
+  const dataReady = minimumElapsed && (summary.isSuccess || maxElapsed) && (trends.isSuccess || maxElapsed);
+  const ready = !loading && dataReady;
 
   return (
     <AnimatePresence mode="wait">
