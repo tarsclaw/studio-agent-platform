@@ -1,4 +1,4 @@
-import { getActiveAccount, loginWithMsal, msalEnabled } from '../msalConfig';
+import { acquireAccessToken, getActiveAccount, isMsalInteractionInProgress, loginWithMsal, msalEnabled } from '../msalConfig';
 
 export interface User {
   name: string;
@@ -6,6 +6,7 @@ export interface User {
 }
 
 const LOCAL_AUTH_BYPASS = import.meta.env.VITE_LOCAL_AUTH_BYPASS === 'true';
+const LOGIN_ATTEMPT_KEY = 'studio_agent_msal_login_started';
 
 function devUser(): User {
   return {
@@ -27,7 +28,33 @@ export async function ensureDashboardLogin(): Promise<void> {
   if (LOCAL_AUTH_BYPASS) return;
   if (msalEnabled) {
     const user = await getUserFromMsal();
-    if (user) return;
+    if (user) {
+      try {
+        sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+      } catch {}
+      return;
+    }
+
+    if (await isMsalInteractionInProgress()) {
+      throw new Error('msal_interaction_in_progress');
+    }
+
+    const loginAttempted = (() => {
+      try {
+        return sessionStorage.getItem(LOGIN_ATTEMPT_KEY) === 'true';
+      } catch {
+        return false;
+      }
+    })();
+
+    if (loginAttempted) {
+      throw new Error('msal_login_pending');
+    }
+
+    try {
+      sessionStorage.setItem(LOGIN_ATTEMPT_KEY, 'true');
+    } catch {}
+
     await loginWithMsal();
     throw new Error('msal_login_redirect_started');
   }
@@ -39,7 +66,13 @@ export async function ensureDashboardLogin(): Promise<void> {
   }
 }
 
-export async function getAccessToken(_options?: { interactive?: boolean }): Promise<string | null> {
+export async function getAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
+  if (LOCAL_AUTH_BYPASS) return 'local-dev-token';
+
+  if (msalEnabled) {
+    return acquireAccessToken(options);
+  }
+
   return null;
 }
 

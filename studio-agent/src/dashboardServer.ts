@@ -15,7 +15,7 @@
  *
  * CORS
  *   Set DASHBOARD_ALLOWED_ORIGIN to your dashboard origin
- *   (for example https://mystudioagent.ai) to enable browser access.
+ *   (for example https://www.mystudioagent.ai) to enable browser access.
  *   Not set → no CORS headers (safe default for server-side-only access).
  */
 

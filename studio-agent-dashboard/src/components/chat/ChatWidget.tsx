@@ -50,9 +50,9 @@ function EmptyState({ onSelect }: { onSelect: (text: string) => void }) {
             <Mail size={16} />
           </div>
           <div>
-            <p className="font-semibold text-[var(--text-primary)]">Signed-in Studio Agent access is ready to finish configuring</p>
+            <p className="font-semibold text-[var(--text-primary)]">Sandbox widget path is live</p>
             <p className="mt-1 leading-relaxed">
-              Admin consent has been granted. The widget and attendance flows now depend on the dashboard being pointed at the correct Entra app and deployed runtime config.
+              Studio Agent is ready to use inside the dashboard widget. Responses currently reflect sandbox HR data, so focus on flow reliability and agent behavior rather than production-grade personal records.
             </p>
           </div>
         </div>
@@ -115,7 +115,7 @@ function Bubble({ message }: { message: ChatMessage }) {
   );
 }
 
-function StatusBanner({ status }: { status: 503 | 401 | 'error' | null }) {
+function StatusBanner({ status }: { status: 503 | 403 | 401 | 'error' | null }) {
   if (!status) return null;
 
   if (status === 503) {
@@ -124,17 +124,17 @@ function StatusBanner({ status }: { status: 503 | 401 | 'error' | null }) {
         <div className="flex items-start gap-2">
           <AlertCircle size={14} className="mt-0.5 flex-shrink-0 text-amber-600" />
           <div>
-            <p className="font-semibold text-[var(--text-primary)]">Dashboard auth configuration still needs updating</p>
+            <p className="font-semibold text-[var(--text-primary)]">Studio Agent is temporarily unavailable</p>
             <p className="mt-1 leading-relaxed text-[var(--text-secondary)]">
-              The widget UI is live, but authenticated Studio Agent actions are blocked until the deployed dashboard and API are both pointed at the consented Entra app.
+              The widget is live, but the backend is currently refusing authenticated Studio Agent requests. Check deployment flags and dashboard auth configuration before retrying.
             </p>
           </div>
         </div>
 
         <div className="rounded-xl border border-white/70 bg-white/80 px-3 py-2.5 text-[11px] leading-relaxed text-[var(--text-secondary)]">
-          <p className="font-semibold text-[var(--text-primary)]">Needed in deployment config</p>
+          <p className="font-semibold text-[var(--text-primary)]">What to check</p>
           <p className="mt-1">
-            Update the live frontend and backend environment variables so both use the same consented Studio Agent Dashboard Entra app registration.
+            Confirm widget rollout flags are enabled and the deployed dashboard auth settings still match the intended Studio Agent environment.
           </p>
         </div>
       </div>
@@ -143,6 +143,7 @@ function StatusBanner({ status }: { status: 503 | 401 | 'error' | null }) {
 
   const messages: Record<string, string> = {
     401: 'Your dashboard sign-in expired. Refresh and sign in again to continue.',
+    403: 'Your sign-in was verified, but Studio Agent could not safely match it to a person record yet. This is blocked on purpose rather than guessing.',
     error: 'Something went wrong while contacting Studio Agent. Please retry.',
   };
   return (
@@ -158,7 +159,7 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [bannerStatus, setBannerStatus] = useState<503 | 401 | 'error' | null>(null);
+  const [bannerStatus, setBannerStatus] = useState<503 | 403 | 401 | 'error' | null>(null);
   const [conversationId, setConversationId] = useState<string | undefined>(undefined);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -191,6 +192,7 @@ export function ChatWidget() {
     } catch (err) {
       if (err instanceof HubApiResponseError) {
         if (err.status === 503) setBannerStatus(503);
+        else if (err.status === 403) setBannerStatus(403);
         else if (err.status === 401) setBannerStatus(401);
         else setBannerStatus('error');
       } else {
@@ -233,14 +235,14 @@ export function ChatWidget() {
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                    Leadership support for attendance, leave pressure, and what needs attention today.
+                    Leadership support for attendance, leave pressure, and what needs attention today, tuned for the current sandbox data environment.
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
                     <span className="rounded-full border border-white/70 bg-white/80 px-2.5 py-1 font-medium text-[var(--text-secondary)]">
                       Widget live
                     </span>
                     <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
-                      Entra consent granted
+                      Sandbox mode
                     </span>
                   </div>
                 </div>
@@ -300,7 +302,7 @@ export function ChatWidget() {
               <div className="px-5 pb-3">
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
                   <div>
-                    <span className="font-semibold text-[var(--text-primary)]">Next unblock:</span> deploy the updated Entra app config so the widget uses the newly consented dashboard app.
+                    <span className="font-semibold text-[var(--text-primary)]">Sandbox note:</span> identity and chat flow are live. Personal answers may reflect fixture HR records while the widget remains on sandbox data.
                   </div>
                   <a
                     href="https://entra.microsoft.com/"
