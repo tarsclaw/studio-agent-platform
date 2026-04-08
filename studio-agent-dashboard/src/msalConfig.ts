@@ -33,6 +33,7 @@ let app: PublicClientApplication | null = null;
 let initialized = false;
 let redirectHandled = false;
 let redirectInFlight = false;
+const LOGIN_ATTEMPT_KEY = 'studio_agent_msal_login_started';
 
 export async function getMsalApp(): Promise<PublicClientApplication | null> {
   if (!msalConfig) return null;
@@ -43,7 +44,13 @@ export async function getMsalApp(): Promise<PublicClientApplication | null> {
   }
   if (!redirectHandled) {
     redirectInFlight = true;
-    await app.handleRedirectPromise().catch(() => null);
+    const redirectResult = await app.handleRedirectPromise().catch(() => null);
+    if (redirectResult?.account) {
+      app.setActiveAccount(redirectResult.account);
+    }
+    try {
+      sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+    } catch {}
     redirectHandled = true;
     redirectInFlight = false;
   }
@@ -73,6 +80,9 @@ export async function loginWithMsal(): Promise<void> {
   const msal = await getMsalApp();
   if (!msal) return;
   if (redirectInFlight) return;
+  try {
+    sessionStorage.setItem(LOGIN_ATTEMPT_KEY, 'true');
+  } catch {}
   redirectInFlight = true;
   await msal.loginRedirect(loginRequest);
 }
@@ -99,6 +109,9 @@ export async function acquireAccessToken(options?: { interactive?: boolean }): P
     return result.accessToken;
   } catch {
     if (interactive && !redirectInFlight) {
+      try {
+        sessionStorage.setItem(LOGIN_ATTEMPT_KEY, 'true');
+      } catch {}
       redirectInFlight = true;
       await msal.acquireTokenRedirect({ ...loginRequest, account });
     }

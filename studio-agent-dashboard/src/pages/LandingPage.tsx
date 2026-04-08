@@ -1,11 +1,18 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Building2 } from 'lucide-react';
+import { loginWithMsal, msalEnabled } from '../msalConfig';
 import { Wordmark } from '../components/shared/Wordmark';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 export function LandingPage() {
   const signInUrl = '/dashboard';
+
+  const handleSignIn = async (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!msalEnabled) return;
+    event.preventDefault();
+    await loginWithMsal();
+  };
 
   return (
     <div className="landing-bg min-h-screen text-[var(--text-primary)]">
@@ -16,7 +23,7 @@ export function LandingPage() {
         className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6"
       >
         <Wordmark size="sm" />
-        <a href={signInUrl} className="btn-secondary inline-flex items-center gap-2">
+        <a href={signInUrl} onClick={handleSignIn} className="btn-secondary inline-flex items-center gap-2">
           Sign In <ArrowRight size={16} />
         </a>
       </motion.header>
@@ -54,6 +61,7 @@ export function LandingPage() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4, ease }}
           href={signInUrl}
+          onClick={handleSignIn}
           className="btn-primary mb-10 inline-flex items-center gap-2 px-8 py-3 text-base font-semibold"
         >
           Sign in with Microsoft <ArrowRight size={16} />
