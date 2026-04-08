@@ -31,6 +31,8 @@ export const loginRequest = {
 
 let app: PublicClientApplication | null = null;
 let initialized = false;
+let redirectHandled = false;
+let redirectInFlight = false;
 
 export async function getMsalApp(): Promise<PublicClientApplication | null> {
   if (!msalConfig) return null;
@@ -38,9 +40,20 @@ export async function getMsalApp(): Promise<PublicClientApplication | null> {
   if (!initialized) {
     await app.initialize();
     initialized = true;
+  }
+  if (!redirectHandled) {
+    redirectInFlight = true;
     await app.handleRedirectPromise().catch(() => null);
+    redirectHandled = true;
+    redirectInFlight = false;
   }
   return app;
+}
+
+export async function isMsalInteractionInProgress(): Promise<boolean> {
+  const msal = await getMsalApp();
+  if (!msal) return false;
+  return redirectInFlight && msal.getAllAccounts().length === 0;
 }
 
 export async function getActiveAccount(): Promise<AccountInfo | null> {
@@ -59,16 +72,21 @@ export async function getActiveAccount(): Promise<AccountInfo | null> {
 export async function loginWithMsal(): Promise<void> {
   const msal = await getMsalApp();
   if (!msal) return;
+  if (redirectInFlight) return;
+  redirectInFlight = true;
   await msal.loginRedirect(loginRequest);
 }
 
-export async function acquireAccessToken(): Promise<string | null> {
+export async function acquireAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
   const msal = await getMsalApp();
   if (!msal) return null;
 
-  let account = await getActiveAccount();
+  const interactive = options?.interactive ?? true;
+  const account = await getActiveAccount();
   if (!account) {
-    await loginWithMsal();
+    if (interactive) {
+      await loginWithMsal();
+    }
     return null;
   }
 
@@ -80,7 +98,10 @@ export async function acquireAccessToken(): Promise<string | null> {
     if (result.account) msal.setActiveAccount(result.account);
     return result.accessToken;
   } catch {
-    await msal.acquireTokenRedirect({ ...loginRequest, account });
+    if (interactive && !redirectInFlight) {
+      redirectInFlight = true;
+      await msal.acquireTokenRedirect({ ...loginRequest, account });
+    }
     return null;
   }
 }

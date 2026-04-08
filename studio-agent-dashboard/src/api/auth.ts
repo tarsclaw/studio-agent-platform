@@ -1,4 +1,4 @@
-import { acquireAccessToken, getActiveAccount, getMsalApp, loginWithMsal, msalEnabled } from '../msalConfig';
+import { acquireAccessToken, getActiveAccount, getMsalApp, isMsalInteractionInProgress, loginWithMsal, msalEnabled } from '../msalConfig';
 
 export interface User {
   name: string;
@@ -28,6 +28,12 @@ export async function ensureDashboardLogin(): Promise<void> {
   if (msalEnabled) {
     const user = await getUserFromMsal();
     if (user) return;
+
+    const interactionInProgress = await isMsalInteractionInProgress();
+    if (interactionInProgress) {
+      throw new Error('msal_interaction_in_progress');
+    }
+
     await loginWithMsal();
     throw new Error('msal_login_redirect_started');
   }
@@ -39,10 +45,10 @@ export async function ensureDashboardLogin(): Promise<void> {
   }
 }
 
-export async function getAccessToken(): Promise<string | null> {
+export async function getAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
   if (LOCAL_AUTH_BYPASS) return null;
   if (!msalEnabled) return null;
-  return acquireAccessToken();
+  return acquireAccessToken(options);
 }
 
 export async function clearMsalSession(): Promise<void> {

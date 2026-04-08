@@ -52,7 +52,7 @@ export class HubApiResponseError extends Error {
 
 async function hubFetch<T>(path: string, init: RequestInit): Promise<T> {
   await ensureDashboardLogin();
-  const token = await getAccessToken();
+  const token = await getAccessToken({ interactive: false });
   if (!token) {
     throw new HubApiResponseError(401, {
       error: 'missing_token',
