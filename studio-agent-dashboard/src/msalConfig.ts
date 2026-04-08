@@ -7,10 +7,10 @@ const apiScope = import.meta.env.VITE_AZURE_AD_API_SCOPE as string | undefined;
 export const msalEnabled = Boolean(clientId && tenantId);
 
 const configuredRedirectUri = import.meta.env.VITE_AZURE_AD_REDIRECT_URI as string | undefined;
-const currentOrigin = typeof window !== 'undefined' ? window.location.origin : undefined;
-const canonicalRedirectOrigin =
-  currentOrigin === 'https://www.mystudioagent.ai' ? 'https://mystudioagent.ai' : currentOrigin;
-const redirectUri = canonicalRedirectOrigin || configuredRedirectUri || window.location.origin;
+const redirectUri =
+  typeof window !== 'undefined' && window.location.hostname === 'www.mystudioagent.ai'
+    ? window.location.origin
+    : configuredRedirectUri || window.location.origin;
 
 export const msalConfig = msalEnabled
   ? {
