@@ -8,6 +8,7 @@ import { LoadingScreen } from '../../pages/LoadingScreen';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { ChatWidget } from '../chat/ChatWidget';
+import { AuthGate } from '../auth/AuthGate';
 
 function lastThirtyDaysRange() {
   const to = new Date();
@@ -20,13 +21,14 @@ function lastThirtyDaysRange() {
 }
 
 export function Shell() {
-  const { user, loading } = useAuth();
+  const { user, loading, authError } = useAuth();
+  const isAuthed = Boolean(user);
   const [minimumElapsed, setMinimumElapsed] = useState(false);
   const [maxElapsed, setMaxElapsed] = useState(false);
 
   const { from, to } = useMemo(lastThirtyDaysRange, []);
-  const summary = useSummary(true);
-  const trends = useTrends(from, to, true);
+  const summary = useSummary(isAuthed);
+  const trends = useTrends(from, to, isAuthed);
 
   useEffect(() => {
     const min = window.setTimeout(() => setMinimumElapsed(true), 1500);
@@ -37,8 +39,16 @@ export function Shell() {
     };
   }, []);
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!isAuthed) {
+    return <AuthGate authError={authError} />;
+  }
+
   const dataReady = minimumElapsed && (summary.isSuccess || maxElapsed) && (trends.isSuccess || maxElapsed);
-  const ready = !loading && dataReady;
+  const ready = dataReady;
 
   return (
     <AnimatePresence mode="wait">
