@@ -20,11 +20,15 @@ export function HolidayAllowanceWidget() {
 
   if (query.isError) {
     const err = query.error;
-    if (err instanceof HubApiResponseError && err.status === 503) {
+    if (err instanceof HubApiResponseError && (err.status === 503 || err.status === 401)) {
       return (
         <EmptyState
-          title="Holiday policy sync still completing"
-          body="The dashboard can already show attendance, but holiday policy coverage will appear here once the Breathe-backed admin endpoint is available in this environment."
+          title={err.status === 401 ? 'Holiday policy sign-in still completing' : 'Holiday policy sync still completing'}
+          body={
+            err.status === 401
+              ? 'Microsoft sign-in worked, but the dashboard still needs the delegated token to finish settling before holiday policy data can load.'
+              : 'The dashboard can already show attendance, but holiday policy coverage will appear here once the Breathe-backed admin endpoint is available in this environment.'
+          }
         />
       );
     }

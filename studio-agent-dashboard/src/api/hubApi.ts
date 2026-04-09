@@ -50,20 +50,12 @@ export class HubApiResponseError extends Error {
   }
 }
 
-async function hubFetch<T>(path: string, init: RequestInit): Promise<T> {
-  await ensureDashboardLogin();
-  const token = await getAccessToken({ interactive: false });
-  if (!token) {
-    throw new HubApiResponseError(401, {
-      error: 'missing_token',
-      message: 'A valid dashboard access token is required before calling Studio Agent.',
-    });
-  }
+async function fetchWithToken<T>(path: string, init: RequestInit, token: string): Promise<T> {
   const res = await fetch(`${HUB_BASE}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Authorization: `Bearer ${token}`,
       ...init.headers,
     },
   });
@@ -79,6 +71,33 @@ async function hubFetch<T>(path: string, init: RequestInit): Promise<T> {
   }
 
   return res.json() as Promise<T>;
+}
+
+async function hubFetch<T>(path: string, init: RequestInit): Promise<T> {
+  await ensureDashboardLogin();
+
+  let token = await getAccessToken({ interactive: false });
+  if (!token) {
+    token = await getAccessToken({ interactive: true });
+  }
+  if (!token) {
+    throw new HubApiResponseError(401, {
+      error: 'missing_token',
+      message: 'A valid dashboard access token is required before calling Studio Agent.',
+    });
+  }
+
+  try {
+    return await fetchWithToken<T>(path, init, token);
+  } catch (err) {
+    if (err instanceof HubApiResponseError && err.status === 401) {
+      const refreshedToken = await getAccessToken({ interactive: true });
+      if (refreshedToken) {
+        return fetchWithToken<T>(path, init, refreshedToken);
+      }
+    }
+    throw err;
+  }
 }
 
 export const hubApi = {

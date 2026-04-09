@@ -151,11 +151,15 @@ export function LeaveOverviewWidget() {
         ) : query.isError ? (
           (() => {
             const err = query.error;
-            if (err instanceof HubApiResponseError && err.status === 503) {
+            if (err instanceof HubApiResponseError && (err.status === 503 || err.status === 401)) {
               return (
                 <EmptyState
-                  title="Leave data pending auth setup"
-                  body="The leave request feed requires the Breathe HR backend to be active in this environment."
+                  title={err.status === 401 ? 'Leave sign-in still completing' : 'Leave data pending auth setup'}
+                  body={
+                    err.status === 401
+                      ? 'Microsoft sign-in worked, but the delegated dashboard token still needs to settle before leave requests can load.'
+                      : 'The leave request feed requires the Breathe HR backend to be active in this environment.'
+                  }
                 />
               );
             }

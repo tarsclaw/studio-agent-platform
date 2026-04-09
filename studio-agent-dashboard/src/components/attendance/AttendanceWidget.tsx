@@ -61,11 +61,15 @@ export function AttendanceWidget() {
 
   if (query.isError) {
     const err = query.error;
-    if (err instanceof HubApiResponseError && err.status === 503) {
+    if (err instanceof HubApiResponseError && (err.status === 503 || err.status === 401)) {
       return (
         <EmptyState
-          title="Attendance setup still completing"
-          body="The Breathe-backed attendance feed is wired, but the final auth and runtime configuration still needs to be active before live attendance can show here."
+          title={err.status === 401 ? 'Attendance sign-in still completing' : 'Attendance setup still completing'}
+          body={
+            err.status === 401
+              ? 'Microsoft sign-in succeeded, but the dashboard is still finalising the delegated access token for the live attendance feed. Refresh once and it should recover automatically.'
+              : 'The Breathe-backed attendance feed is wired, but the final auth and runtime configuration still needs to be active before live attendance can show here.'
+          }
         />
       );
     }
