@@ -11,7 +11,7 @@ export function LandingPage() {
   const handleSignIn = async (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (!msalEnabled) return;
     event.preventDefault();
-    await loginWithMsal();
+    await loginWithMsal('/dashboard/overview');
   };
 
   return (

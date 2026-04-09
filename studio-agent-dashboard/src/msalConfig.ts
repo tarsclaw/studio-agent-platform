@@ -32,19 +32,15 @@ export const loginRequest = {
 
 const DEFAULT_POST_LOGIN_PATH = '/dashboard/overview';
 
-function getPostLoginPath(): string {
-  if (typeof window === 'undefined') return DEFAULT_POST_LOGIN_PATH;
-  const { pathname, search, hash } = window.location;
-  if (pathname.startsWith('/dashboard')) {
-    return `${pathname}${search}${hash}`;
-  }
-  return DEFAULT_POST_LOGIN_PATH;
+function normalizeReturnTo(path?: string | null): string {
+  if (!path || !path.startsWith('/dashboard')) return DEFAULT_POST_LOGIN_PATH;
+  return path;
 }
 
-function buildLoginRequest(): RedirectRequest {
+function buildLoginRequest(returnTo?: string): RedirectRequest {
   return {
     ...loginRequest,
-    state: JSON.stringify({ returnTo: getPostLoginPath() }),
+    state: JSON.stringify({ returnTo: normalizeReturnTo(returnTo) }),
   };
 }
 
@@ -139,13 +135,13 @@ export async function getActiveAccount(): Promise<AccountInfo | null> {
   return null;
 }
 
-export async function loginWithMsal(): Promise<void> {
+export async function loginWithMsal(returnTo?: string): Promise<void> {
   const msal = await getMsalApp();
   if (!msal) return;
   if (redirectInFlight) return;
   markLoginAttempt();
   redirectInFlight = true;
-  await msal.loginRedirect(buildLoginRequest());
+  await msal.loginRedirect(buildLoginRequest(returnTo));
 }
 
 export async function acquireAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
@@ -172,7 +168,7 @@ export async function acquireAccessToken(options?: { interactive?: boolean }): P
     if (interactive && !redirectInFlight) {
       markLoginAttempt();
       redirectInFlight = true;
-      await msal.acquireTokenRedirect({ ...buildLoginRequest(), account });
+      await msal.acquireTokenRedirect({ ...buildLoginRequest('/dashboard/overview'), account });
     }
     return null;
   }

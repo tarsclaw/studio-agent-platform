@@ -43,7 +43,7 @@ export function AuthGate({ authError }: { authError: string | null }) {
         <div className="mt-8 flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={() => void loginWithMsal()}
+            onClick={() => void loginWithMsal('/dashboard/overview')}
             className="btn-primary inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold"
           >
             Sign in with Microsoft <ArrowRight size={16} />
