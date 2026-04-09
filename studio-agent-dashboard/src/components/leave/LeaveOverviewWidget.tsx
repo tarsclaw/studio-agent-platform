@@ -1,6 +1,7 @@
 import { CalendarDays, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { HubApiResponseError } from '../../api/hubApi';
+import { useAuth } from '../../hooks/useAuth';
 import { useLeaveRequests } from '../../hooks/useLeaveRequests';
 import { EmptyState } from '../shared/EmptyState';
 import { ErrorState } from '../shared/ErrorState';
@@ -95,7 +96,8 @@ const FILTERS = [
 
 export function LeaveOverviewWidget() {
   const [activeFilter, setActiveFilter] = useState<string>('all');
-  const query = useLeaveRequests({ status: activeFilter === 'all' ? undefined : activeFilter, limit: 40 });
+  const { accessToken, status } = useAuth();
+  const query = useLeaveRequests({ status: activeFilter === 'all' ? undefined : activeFilter, limit: 40 }, accessToken, status === 'token_ready');
 
   return (
     <section className="card p-6">
@@ -142,7 +144,16 @@ export function LeaveOverviewWidget() {
       </div>
 
       <div className="mt-6">
-        {query.isLoading ? (
+        {status !== 'token_ready' ? (
+          <EmptyState
+            title={status === 'redirect_processing' ? 'Leave sign-in still completing' : 'Leave requests are waiting for dashboard auth'}
+            body={
+              status === 'redirect_processing'
+                ? 'Microsoft sign-in is still being finalised before leave requests can use the shared dashboard token.'
+                : 'This widget now waits for the shared dashboard auth coordinator instead of triggering protected requests too early.'
+            }
+          />
+        ) : query.isLoading ? (
           <div className="space-y-2">
             {[1, 2, 3].map((n) => (
               <LoadingSkeleton key={n} className="h-20 w-full rounded-xl" />

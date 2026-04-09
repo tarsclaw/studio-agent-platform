@@ -1,5 +1,6 @@
 import { CalendarDays, CheckCircle2, Layers3, RefreshCw } from 'lucide-react';
 import { HubApiResponseError } from '../../api/hubApi';
+import { useAuth } from '../../hooks/useAuth';
 import { useHolidayAllowances } from '../../hooks/useHolidayAllowances';
 import { EmptyState } from '../shared/EmptyState';
 import { ErrorState } from '../shared/ErrorState';
@@ -12,7 +13,21 @@ function formatAmount(value: number | null, units: string) {
 }
 
 export function HolidayAllowanceWidget() {
-  const query = useHolidayAllowances();
+  const { accessToken, status } = useAuth();
+  const query = useHolidayAllowances(accessToken, status === 'token_ready');
+
+  if (status !== 'token_ready') {
+    return (
+      <EmptyState
+        title={status === 'redirect_processing' ? 'Holiday policy sign-in still completing' : 'Holiday policy is waiting for dashboard auth'}
+        body={
+          status === 'redirect_processing'
+            ? 'Microsoft sign-in is still being finalised before the holiday policy token can be used.'
+            : 'This widget now waits for the shared dashboard auth coordinator before making protected requests.'
+        }
+      />
+    );
+  }
 
   if (query.isLoading) {
     return <LoadingSkeleton className="h-[360px] w-full rounded-2xl" />;

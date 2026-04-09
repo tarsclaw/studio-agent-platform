@@ -19,6 +19,10 @@ const COPY: Record<string, { title: string; body: string }> = {
     title: 'Authentication failed',
     body: 'The dashboard could not establish a valid Microsoft session. Try again, and if it repeats, the Entra app setup still needs fixing.',
   },
+  token_unavailable: {
+    title: 'Signed in, but token not ready',
+    body: 'Microsoft sign-in appears to have completed, but the dashboard has not yet established a usable API token. This is now treated as a token-state problem, not an automatic sign-in loop.',
+  },
 };
 
 export function AuthGate({ authError }: { authError: string | null }) {

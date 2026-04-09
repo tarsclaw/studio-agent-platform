@@ -18,7 +18,8 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
-import { hubApi, HubApiResponseError, type ChatMessage } from '../../api/hubApi';
+import { hubApi, HubApiResponseError, DashboardAuthStateError, type ChatMessage } from '../../api/hubApi';
+import type { DashboardAuthStatus } from '../../hooks/useAuth';
 
 const PLACEHOLDER_PROMPTS = [
   'What needs my attention today across the studios?',
@@ -115,7 +116,7 @@ function Bubble({ message }: { message: ChatMessage }) {
   );
 }
 
-function StatusBanner({ status }: { status: 503 | 403 | 401 | 'error' | null }) {
+function StatusBanner({ status }: { status: 503 | 403 | 401 | 'auth_pending' | 'error' | null }) {
   if (!status) return null;
 
   if (status === 503) {
@@ -142,8 +143,9 @@ function StatusBanner({ status }: { status: 503 | 403 | 401 | 'error' | null }) 
   }
 
   const messages: Record<string, string> = {
-    401: 'Your dashboard sign-in expired. Refresh and sign in again to continue.',
+    401: 'Studio Agent received an unauthorised API response. This is now treated as a token/backend mismatch, not an automatic re-login trigger.',
     403: 'Your sign-in was verified, but Studio Agent could not safely match it to a person record yet. This is blocked on purpose rather than guessing.',
+    auth_pending: 'Studio Agent is waiting for the dashboard auth coordinator to finish establishing a usable token.',
     error: 'Something went wrong while contacting Studio Agent. Please retry.',
   };
   return (
@@ -154,12 +156,12 @@ function StatusBanner({ status }: { status: 503 | 403 | 401 | 'error' | null }) 
   );
 }
 
-export function ChatWidget() {
+export function ChatWidget({ authStatus, accessToken }: { authStatus: DashboardAuthStatus; accessToken: string | null }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [bannerStatus, setBannerStatus] = useState<503 | 403 | 401 | 'error' | null>(null);
+  const [bannerStatus, setBannerStatus] = useState<503 | 403 | 401 | 'auth_pending' | 'error' | null>(null);
   const [conversationId, setConversationId] = useState<string | undefined>(undefined);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -179,6 +181,11 @@ export function ChatWidget() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
+    if (authStatus !== 'token_ready' || !accessToken) {
+      setBannerStatus('auth_pending');
+      return;
+    }
+
     setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
     setInputText('');
     setIsLoading(true);
@@ -186,11 +193,13 @@ export function ChatWidget() {
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
 
     try {
-      const res = await hubApi.chat({ text: trimmed, conversation_id: conversationId });
+      const res = await hubApi.chat({ text: trimmed, conversation_id: conversationId }, accessToken);
       setConversationId(res.conversation_id);
       setMessages((prev) => [...prev, { role: 'assistant', text: res.reply }]);
     } catch (err) {
-      if (err instanceof HubApiResponseError) {
+      if (err instanceof DashboardAuthStateError) {
+        setBannerStatus('auth_pending');
+      } else if (err instanceof HubApiResponseError) {
         if (err.status === 503) setBannerStatus(503);
         else if (err.status === 403) setBannerStatus(403);
         else if (err.status === 401) setBannerStatus(401);

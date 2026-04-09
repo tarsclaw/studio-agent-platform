@@ -21,7 +21,7 @@ function lastThirtyDaysRange() {
 }
 
 export function Shell() {
-  const { user, loading, authError } = useAuth();
+  const { user, loading, authError, status, accessToken } = useAuth();
   const isAuthed = Boolean(user);
   const [minimumElapsed, setMinimumElapsed] = useState(false);
   const [maxElapsed, setMaxElapsed] = useState(false);
@@ -66,7 +66,7 @@ export function Shell() {
         >
           <Sidebar user={user} />
           <TopBar user={user} />
-          <ChatWidget />
+          <ChatWidget authStatus={status} accessToken={accessToken} />
           <main className="ml-[240px] bg-[var(--bg-secondary)] pt-14">
             <div className="h-[calc(100vh-56px)] overflow-y-auto p-8">
               <div className="mx-auto max-w-[1400px]">

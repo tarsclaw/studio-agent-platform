@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './index.css';
 import { PeriodProvider } from './hooks/usePeriod';
+import { AuthProvider } from './hooks/useAuth';
 import { getMsalApp, msalEnabled } from './msalConfig';
 
 if (typeof window !== 'undefined') {
@@ -39,11 +40,13 @@ async function bootstrap() {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <PeriodProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </PeriodProvider>
+        <AuthProvider>
+          <PeriodProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </PeriodProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </React.StrictMode>,
   );

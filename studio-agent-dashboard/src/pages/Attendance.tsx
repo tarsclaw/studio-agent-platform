@@ -1,6 +1,7 @@
 import { CalendarDays, RefreshCcw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useAttendance } from '../hooks/useAttendance';
+import { useAuth } from '../hooks/useAuth';
 import { AttendanceAbsencePreview } from '../components/attendance/AttendanceAbsencePreview';
 import { AttendanceAlertsPanel } from '../components/attendance/AttendanceAlertsPanel';
 import { AttendanceCompanyCard } from '../components/attendance/AttendanceCompanyCard';
@@ -24,7 +25,8 @@ export function Attendance() {
   const [date, setDate] = useState(todayDateString());
   const [mode, setMode] = useState<AttendanceMode>('overview');
   const [selectedCompany, setSelectedCompany] = useState('Allect');
-  const query = useAttendance(date);
+  const { accessToken, status } = useAuth();
+  const query = useAttendance(date, accessToken, status === 'token_ready');
 
   const model = useMemo(() => {
     if (!query.data) return null;
@@ -38,6 +40,19 @@ export function Attendance() {
       selectedCompany: companies.find((item) => item.name === selectedCompany) ?? companies[0] ?? null,
     };
   }, [query.data, selectedCompany]);
+
+  if (status !== 'token_ready') {
+    return (
+      <EmptyState
+        title={status === 'redirect_processing' ? 'Attendance sign-in still completing' : 'Attendance is waiting for dashboard auth'}
+        body={
+          status === 'redirect_processing'
+            ? 'Microsoft sign-in is still being finalised before the live attendance token can be used. Once auth settles, this page should populate normally.'
+            : 'The attendance view now waits for a ready dashboard token before making protected requests. This avoids false auth loops and premature failures.'
+        }
+      />
+    );
+  }
 
   if (query.isLoading) {
     return <LoadingSkeleton className="h-[680px] w-full rounded-3xl" />;

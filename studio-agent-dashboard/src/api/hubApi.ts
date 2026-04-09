@@ -3,21 +3,9 @@
  *
  * API client for the Studio Agent Dashboard backend (port 3979 / /api/* in prod).
  * Separate from the analytics client (client.ts) — different origin, different auth.
- *
- * Base URL
- *   VITE_HUB_API_BASE  — set to http://localhost:3979 in dev
- *                      — leave empty (default) for same-origin in production
- *
- * Auth
- *   Requests include Authorization: Bearer <token> when a token is available.
- *   The backend returns 503 (auth not yet configured) or 401 (invalid token)
- *   until the deployed backend has matching AZURE_AD_TENANT_ID + AZURE_AD_CLIENT_ID
- *   for the consented dashboard app registration.
- *   The UI handles both states gracefully rather than crashing.
  */
 
 import type { AttendanceResponse, HolidayAllowanceResponse, LeaveResponse } from './types';
-import { ensureDashboardLogin, getAccessToken } from './auth';
 
 const HUB_BASE: string = (import.meta.env.VITE_HUB_API_BASE as string | undefined) ?? '';
 
@@ -50,6 +38,15 @@ export class HubApiResponseError extends Error {
   }
 }
 
+export class DashboardAuthStateError extends Error {
+  constructor(
+    public readonly code: 'token_unavailable' | 'auth_not_ready',
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
 async function fetchWithToken<T>(path: string, init: RequestInit, token: string): Promise<T> {
   const res = await fetch(`${HUB_BASE}${path}`, {
     ...init,
@@ -65,7 +62,7 @@ async function fetchWithToken<T>(path: string, init: RequestInit, token: string)
     try {
       body = await res.json();
     } catch {
-      // non-JSON error body — keep default
+      // keep default body
     }
     throw new HubApiResponseError(res.status, body);
   }
@@ -73,55 +70,35 @@ async function fetchWithToken<T>(path: string, init: RequestInit, token: string)
   return res.json() as Promise<T>;
 }
 
-async function hubFetch<T>(path: string, init: RequestInit): Promise<T> {
-  await ensureDashboardLogin();
-
-  let token = await getAccessToken({ interactive: false });
+async function hubFetch<T>(path: string, init: RequestInit, token?: string | null): Promise<T> {
   if (!token) {
-    token = await getAccessToken({ interactive: true });
+    throw new DashboardAuthStateError('token_unavailable', 'Dashboard token is not ready yet.');
   }
-  if (!token) {
-    throw new HubApiResponseError(401, {
-      error: 'missing_token',
-      message: 'A valid dashboard access token is required before calling Studio Agent.',
-    });
-  }
-
-  try {
-    return await fetchWithToken<T>(path, init, token);
-  } catch (err) {
-    if (err instanceof HubApiResponseError && err.status === 401) {
-      const refreshedToken = await getAccessToken({ interactive: true });
-      if (refreshedToken) {
-        return fetchWithToken<T>(path, init, refreshedToken);
-      }
-    }
-    throw err;
-  }
+  return fetchWithToken<T>(path, init, token);
 }
 
 export const hubApi = {
-  chat: (req: ChatRequest): Promise<ChatResponse> =>
+  chat: (req: ChatRequest, token?: string | null): Promise<ChatResponse> =>
     hubFetch<ChatResponse>('/api/chat', {
       method: 'POST',
       body: JSON.stringify(req),
-    }),
+    }, token),
 
-  attendance: (date: string): Promise<AttendanceResponse> =>
+  attendance: (date: string, token?: string | null): Promise<AttendanceResponse> =>
     hubFetch<AttendanceResponse>(`/api/attendance?date=${encodeURIComponent(date)}`, {
       method: 'GET',
-    }),
+    }, token),
 
-  holidayAllowances: (): Promise<HolidayAllowanceResponse> =>
+  holidayAllowances: (token?: string | null): Promise<HolidayAllowanceResponse> =>
     hubFetch<HolidayAllowanceResponse>('/api/holiday-allowances', {
       method: 'GET',
-    }),
+    }, token),
 
-  leaveRequests: (params?: { status?: string; limit?: number }): Promise<LeaveResponse> => {
+  leaveRequests: (params?: { status?: string; limit?: number }, token?: string | null): Promise<LeaveResponse> => {
     const qs = new URLSearchParams();
     if (params?.status) qs.set('status', params.status);
     if (params?.limit) qs.set('limit', String(params.limit));
     const query = qs.toString() ? `?${qs.toString()}` : '';
-    return hubFetch<LeaveResponse>(`/api/leave-requests${query}`, { method: 'GET' });
+    return hubFetch<LeaveResponse>(`/api/leave-requests${query}`, { method: 'GET' }, token);
   },
 };
