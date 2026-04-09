@@ -18,7 +18,7 @@ export interface AuthState {
 
 const LOGIN_ATTEMPT_KEY = 'studio_agent_msal_login_started';
 const LOGIN_ATTEMPT_AT_KEY = 'studio_agent_msal_login_started_at';
-const LOGIN_PENDING_TIMEOUT_MS = 15000;
+const LOGIN_PENDING_TIMEOUT_MS = 5000;
 
 const initialAuthState: AuthState = {
   user: null,
@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (message === 'msal_interaction_in_progress' || message === 'msal_login_redirect_started') {
+        if (message === 'msal_interaction_in_progress' || message === 'msal_login_redirect_started' || message === 'sign_in_required') {
           setState((current) => ({
             ...current,
             loading: true,

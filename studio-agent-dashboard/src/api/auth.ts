@@ -1,4 +1,4 @@
-import { acquireAccessToken, getActiveAccount, isMsalInteractionInProgress, loginWithMsal, msalEnabled } from '../msalConfig';
+import { acquireAccessToken, getActiveAccount, isMsalInteractionInProgress, msalEnabled } from '../msalConfig';
 
 export interface User {
   name: string;
@@ -66,8 +66,7 @@ export async function ensureDashboardLogin(): Promise<void> {
     throw new Error('msal_login_pending');
   }
 
-  await loginWithMsal();
-  throw new Error('msal_login_redirect_started');
+  throw new Error('sign_in_required');
 }
 
 export async function getAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
