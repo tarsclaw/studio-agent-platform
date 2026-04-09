@@ -7,6 +7,8 @@ export interface User {
 
 const LOCAL_AUTH_BYPASS = import.meta.env.VITE_LOCAL_AUTH_BYPASS === 'true';
 const LOGIN_ATTEMPT_KEY = 'studio_agent_msal_login_started';
+const LOGIN_ATTEMPT_AT_KEY = 'studio_agent_msal_login_started_at';
+const LOGIN_ATTEMPT_STALE_MS = 2 * 60 * 1000;
 
 function devUser(): User {
   return {
@@ -35,6 +37,7 @@ export async function ensureDashboardLogin(): Promise<void> {
   if (user) {
     try {
       sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+      sessionStorage.removeItem(LOGIN_ATTEMPT_AT_KEY);
     } catch {}
     return;
   }
@@ -45,7 +48,15 @@ export async function ensureDashboardLogin(): Promise<void> {
 
   const loginAttempted = (() => {
     try {
-      return sessionStorage.getItem(LOGIN_ATTEMPT_KEY) === 'true';
+      if (sessionStorage.getItem(LOGIN_ATTEMPT_KEY) !== 'true') return false;
+      const raw = sessionStorage.getItem(LOGIN_ATTEMPT_AT_KEY);
+      const startedAt = raw ? Number(raw) : NaN;
+      if (Number.isFinite(startedAt) && Date.now() - startedAt > LOGIN_ATTEMPT_STALE_MS) {
+        sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+        sessionStorage.removeItem(LOGIN_ATTEMPT_AT_KEY);
+        return false;
+      }
+      return true;
     } catch {
       return false;
     }
@@ -69,6 +80,7 @@ export async function clearMsalSession(): Promise<void> {
   if (!msalEnabled) return;
   try {
     sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+    sessionStorage.removeItem(LOGIN_ATTEMPT_AT_KEY);
   } catch {}
 }
 

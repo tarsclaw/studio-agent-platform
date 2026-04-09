@@ -35,6 +35,38 @@ let initialized = false;
 let redirectHandled = false;
 let redirectInFlight = false;
 const LOGIN_ATTEMPT_KEY = 'studio_agent_msal_login_started';
+const LOGIN_ATTEMPT_AT_KEY = 'studio_agent_msal_login_started_at';
+const LOGIN_ATTEMPT_STALE_MS = 2 * 60 * 1000;
+
+function clearLoginAttempt(): void {
+  try {
+    sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+    sessionStorage.removeItem(LOGIN_ATTEMPT_AT_KEY);
+  } catch {}
+}
+
+function markLoginAttempt(): void {
+  try {
+    sessionStorage.setItem(LOGIN_ATTEMPT_KEY, 'true');
+    sessionStorage.setItem(LOGIN_ATTEMPT_AT_KEY, String(Date.now()));
+  } catch {}
+}
+
+function hasFreshLoginAttempt(): boolean {
+  try {
+    if (sessionStorage.getItem(LOGIN_ATTEMPT_KEY) !== 'true') return false;
+    const raw = sessionStorage.getItem(LOGIN_ATTEMPT_AT_KEY);
+    const startedAt = raw ? Number(raw) : NaN;
+    if (!Number.isFinite(startedAt)) return true;
+    if (Date.now() - startedAt > LOGIN_ATTEMPT_STALE_MS) {
+      clearLoginAttempt();
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function getMsalApp(): Promise<PublicClientApplication | null> {
   if (!msalConfig) return null;
@@ -49,9 +81,7 @@ export async function getMsalApp(): Promise<PublicClientApplication | null> {
     if (redirectResult?.account) {
       app.setActiveAccount(redirectResult.account);
     }
-    try {
-      sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
-    } catch {}
+    clearLoginAttempt();
     redirectHandled = true;
     redirectInFlight = false;
   }
@@ -61,7 +91,7 @@ export async function getMsalApp(): Promise<PublicClientApplication | null> {
 export async function isMsalInteractionInProgress(): Promise<boolean> {
   const msal = await getMsalApp();
   if (!msal) return false;
-  return redirectInFlight && msal.getAllAccounts().length === 0;
+  return (redirectInFlight || hasFreshLoginAttempt()) && msal.getAllAccounts().length === 0;
 }
 
 export async function getActiveAccount(): Promise<AccountInfo | null> {
@@ -81,9 +111,7 @@ export async function loginWithMsal(): Promise<void> {
   const msal = await getMsalApp();
   if (!msal) return;
   if (redirectInFlight) return;
-  try {
-    sessionStorage.setItem(LOGIN_ATTEMPT_KEY, 'true');
-  } catch {}
+  markLoginAttempt();
   redirectInFlight = true;
   await msal.loginRedirect(loginRequest);
 }
@@ -110,9 +138,7 @@ export async function acquireAccessToken(options?: { interactive?: boolean }): P
     return result.accessToken;
   } catch {
     if (interactive && !redirectInFlight) {
-      try {
-        sessionStorage.setItem(LOGIN_ATTEMPT_KEY, 'true');
-      } catch {}
+      markLoginAttempt();
       redirectInFlight = true;
       await msal.acquireTokenRedirect({ ...loginRequest, account });
     }
