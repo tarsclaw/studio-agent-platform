@@ -9,9 +9,7 @@ import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
-  ExternalLink,
   Loader2,
-  Mail,
   RotateCcw,
   Send,
   ShieldCheck,
@@ -45,20 +43,6 @@ function StudioAgentMark({ compact = false }: { compact?: boolean }) {
 function EmptyState({ onSelect }: { onSelect: (text: string) => void }) {
   return (
     <div className="flex flex-col gap-5 py-5">
-      <div className="rounded-2xl border border-amber-200/80 bg-[linear-gradient(135deg,rgba(251,191,36,0.12),rgba(255,255,255,0.94))] px-4 py-4 text-sm text-[var(--text-secondary)] shadow-[var(--shadow-sm)]">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 rounded-xl bg-amber-100 p-2 text-amber-700">
-            <Mail size={16} />
-          </div>
-          <div>
-            <p className="font-semibold text-[var(--text-primary)]">Sandbox widget path is live</p>
-            <p className="mt-1 leading-relaxed">
-              Studio Agent is ready to use inside the dashboard widget. Responses currently reflect sandbox HR data, so focus on flow reliability and agent behavior rather than production-grade personal records.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="flex items-start gap-3 rounded-2xl border border-[var(--border-primary)] bg-[linear-gradient(135deg,rgba(16,185,129,0.10),rgba(255,255,255,0.95))] px-4 py-4">
         <StudioAgentMark />
         <div className="min-w-0">
@@ -244,16 +228,8 @@ export function ChatWidget({ authStatus, accessToken }: { authStatus: DashboardA
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                    Leadership support for attendance, leave pressure, and what needs attention today, tuned for the current sandbox data environment.
+                    Leadership support for leave pressure, operational risks, and what needs attention today.
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
-                    <span className="rounded-full border border-white/70 bg-white/80 px-2.5 py-1 font-medium text-[var(--text-secondary)]">
-                      Widget live
-                    </span>
-                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
-                      Sandbox mode
-                    </span>
-                  </div>
                 </div>
                 <div className="flex items-center gap-1">
                   {conversationId && (
@@ -307,23 +283,6 @@ export function ChatWidget({ authStatus, accessToken }: { authStatus: DashboardA
               </div>
             )}
 
-            {!bannerStatus && messages.length === 0 && (
-              <div className="px-5 pb-3">
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
-                  <div>
-                    <span className="font-semibold text-[var(--text-primary)]">Sandbox note:</span> identity and chat flow are live. Personal answers may reflect fixture HR records while the widget remains on sandbox data.
-                  </div>
-                  <a
-                    href="https://entra.microsoft.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-primary)] bg-white px-2 py-1 font-medium text-[var(--text-primary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
-                  >
-                    Entra <ExternalLink size={12} />
-                  </a>
-                </div>
-              </div>
-            )}
 
             <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-primary)] px-4 py-4">
               <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">

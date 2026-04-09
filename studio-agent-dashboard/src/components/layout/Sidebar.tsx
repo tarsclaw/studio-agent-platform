@@ -1,6 +1,5 @@
 import {
   Activity,
-  CalendarDays,
   Gauge,
   GitCompare,
   LayoutDashboard,
@@ -19,7 +18,6 @@ const fallbackUser: User = {
 
 const navItems = [
   { to: '/dashboard/overview', label: 'Overview', icon: LayoutDashboard },
-  { to: '/dashboard/attendance', label: 'Attendance', icon: CalendarDays },
   { to: '/dashboard/roi', label: 'ROI & Savings', icon: PiggyBank },
   { to: '/dashboard/usage', label: 'Usage & Adoption', icon: Activity },
   { to: '/dashboard/performance', label: 'Performance', icon: Gauge },
