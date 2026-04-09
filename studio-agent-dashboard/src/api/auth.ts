@@ -26,54 +26,43 @@ async function getUserFromMsal(): Promise<User | null> {
 
 export async function ensureDashboardLogin(): Promise<void> {
   if (LOCAL_AUTH_BYPASS) return;
-  if (msalEnabled) {
-    const user = await getUserFromMsal();
-    if (user) {
-      try {
-        sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
-      } catch {}
-      return;
-    }
 
-    if (await isMsalInteractionInProgress()) {
-      throw new Error('msal_interaction_in_progress');
-    }
+  if (!msalEnabled) {
+    throw new Error('msal_not_configured');
+  }
 
-    const loginAttempted = (() => {
-      try {
-        return sessionStorage.getItem(LOGIN_ATTEMPT_KEY) === 'true';
-      } catch {
-        return false;
-      }
-    })();
-
-    if (loginAttempted) {
-      throw new Error('msal_login_pending');
-    }
-
+  const user = await getUserFromMsal();
+  if (user) {
     try {
-      sessionStorage.setItem(LOGIN_ATTEMPT_KEY, 'true');
+      sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
     } catch {}
-
-    await loginWithMsal();
-    throw new Error('msal_login_redirect_started');
+    return;
   }
 
-  const user = await getUser();
-  if (!user) {
-    window.location.href = '/.auth/login/aad?post_login_redirect_uri=/dashboard';
-    throw new Error('swa_login_redirect_started');
+  if (await isMsalInteractionInProgress()) {
+    throw new Error('msal_interaction_in_progress');
   }
+
+  const loginAttempted = (() => {
+    try {
+      return sessionStorage.getItem(LOGIN_ATTEMPT_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  })();
+
+  if (loginAttempted) {
+    throw new Error('msal_login_pending');
+  }
+
+  await loginWithMsal();
+  throw new Error('msal_login_redirect_started');
 }
 
 export async function getAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
   if (LOCAL_AUTH_BYPASS) return 'local-dev-token';
-
-  if (msalEnabled) {
-    return acquireAccessToken(options);
-  }
-
-  return null;
+  if (!msalEnabled) return null;
+  return acquireAccessToken(options);
 }
 
 export async function clearMsalSession(): Promise<void> {
@@ -85,24 +74,8 @@ export async function clearMsalSession(): Promise<void> {
 
 export async function getUser(): Promise<User | null> {
   if (LOCAL_AUTH_BYPASS) return devUser();
-
-  if (msalEnabled) {
-    const user = await getUserFromMsal();
-    if (user) return user;
-    return null;
-  }
-
-  try {
-    const res = await fetch('/.auth/me');
-    const data = await res.json();
-    const principal = data.clientPrincipal;
-    if (!principal) return null;
-
-    return {
-      name: principal.userDetails?.split('@')[0] || 'User',
-      email: principal.userDetails || '',
-    };
-  } catch {
-    return null;
-  }
+  if (!msalEnabled) return null;
+  const user = await getUserFromMsal();
+  if (user) return user;
+  return null;
 }

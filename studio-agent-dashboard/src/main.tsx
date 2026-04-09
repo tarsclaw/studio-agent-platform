@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './index.css';
 import { PeriodProvider } from './hooks/usePeriod';
+import { getMsalApp, msalEnabled } from './msalConfig';
 
 if (typeof window !== 'undefined') {
   (window as any).__STUDIO_AGENT_ENV__ = {
@@ -30,14 +31,22 @@ const queryClient = new QueryClient({
   },
 });
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <PeriodProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </PeriodProvider>
-    </QueryClientProvider>
-  </React.StrictMode>,
-);
+async function bootstrap() {
+  if (msalEnabled) {
+    await getMsalApp();
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <PeriodProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </PeriodProvider>
+      </QueryClientProvider>
+    </React.StrictMode>,
+  );
+}
+
+bootstrap();

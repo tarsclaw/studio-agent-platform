@@ -3,8 +3,9 @@ import { PublicClientApplication, type AccountInfo, type AuthenticationResult, B
 const clientId = import.meta.env.VITE_AZURE_AD_CLIENT_ID as string | undefined;
 const tenantId = import.meta.env.VITE_AZURE_AD_TENANT_ID as string | undefined;
 const apiScope = import.meta.env.VITE_AZURE_AD_API_SCOPE as string | undefined;
+const authMode = (import.meta.env.VITE_AUTH_MODE as string | undefined)?.toLowerCase();
 
-export const msalEnabled = Boolean(clientId && tenantId);
+export const msalEnabled = authMode === 'msal' && Boolean(clientId && tenantId);
 
 const configuredRedirectUri = import.meta.env.VITE_AZURE_AD_REDIRECT_URI as string | undefined;
 const redirectUri =
