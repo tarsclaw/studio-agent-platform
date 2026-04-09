@@ -71,6 +71,22 @@ function normalizeCsv(value?: string): string[] {
     .filter(Boolean);
 }
 
+function resolveExpectedAudiences(clientId?: string, apiScope?: string): [string, ...string[]] | string | undefined {
+  const raw = new Set<string>();
+  if (clientId) {
+    raw.add(clientId);
+    raw.add(`api://${clientId}`);
+  }
+  if (apiScope) {
+    raw.add(apiScope);
+    const trimmedScope = apiScope.replace(/\/access_as_user$/i, '');
+    raw.add(trimmedScope);
+  }
+  const audiences = Array.from(raw).filter(Boolean);
+  if (audiences.length === 0) return undefined;
+  return audiences.length === 1 ? audiences[0] : (audiences as [string, ...string[]]);
+}
+
 function resolveDashboardRole(oid?: string, email?: string): 'employee' | 'admin' {
   if (process.env.DASHBOARD_FORCE_ADMIN === 'true') return 'admin';
   const adminOids = normalizeCsv(process.env.DASHBOARD_ADMIN_OIDS);
@@ -102,9 +118,7 @@ export function requireMsalAuth(
   const tenantId = process.env.AZURE_AD_TENANT_ID;
   const clientId = process.env.AZURE_AD_CLIENT_ID;
   const apiScope = process.env.AZURE_AD_API_SCOPE;
-  const apiAudience = apiScope?.startsWith('api://') ? apiScope.replace(/\/access_as_user$/i, '') : undefined;
-  const audiences = [clientId, apiAudience].filter((value): value is string => Boolean(value));
-  const audience = audiences.length <= 1 ? clientId : (audiences as [string, ...string[]]);
+  const audience = resolveExpectedAudiences(clientId, apiScope);
 
   if (!tenantId || !clientId) {
     res.status(503).json({
@@ -159,18 +173,18 @@ export function requireMsalAuth(
       }
 
       const claims = decoded as Record<string, any>;
-      const oid = claims.oid ?? claims.sub ?? "";
+      const oid = claims.oid ?? claims.sub ?? '';
       const tid = claims.tid ?? tenantId;
+      const email = claims.preferred_username ?? claims.upn ?? claims.email;
 
       if (!oid) {
         res.status(401).json({
-          error: "missing_oid",
-          message: "Token is missing the oid claim — cannot establish user identity.",
+          error: 'missing_subject',
+          message: 'Token is missing both oid and sub claims, so user identity cannot be established.',
         });
         return;
       }
 
-      const email = claims.preferred_username ?? claims.upn;
       req.auth = {
         oid,
         tid,
