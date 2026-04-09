@@ -104,6 +104,7 @@ export function requireMsalAuth(
   const apiScope = process.env.AZURE_AD_API_SCOPE;
   const apiAudience = apiScope?.startsWith('api://') ? apiScope.replace(/\/access_as_user$/i, '') : undefined;
   const audiences = [clientId, apiAudience].filter((value): value is string => Boolean(value));
+  const audience = audiences.length <= 1 ? clientId : (audiences as [string, ...string[]]);
 
   if (!tenantId || !clientId) {
     res.status(503).json({
@@ -143,7 +144,7 @@ export function requireMsalAuth(
     token,
     getKey,
     {
-      audience: audiences,
+      audience,
       // Azure AD v2.0 tokens may carry either issuer format
       issuer: [
         `https://login.microsoftonline.com/${tenantId}/v2.0`,
