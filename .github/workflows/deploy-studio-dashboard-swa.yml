@@ -31,7 +31,7 @@ jobs:
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
           VITE_HUB_API_BASE: ${{ secrets.VITE_HUB_API_BASE }}
-          VITE_AUTH_MODE: ${{ secrets.VITE_AUTH_MODE }}
+          VITE_AUTH_MODE: ${{ secrets.VITE_AUTH_MODE != '' && secrets.VITE_AUTH_MODE || 'msal' }}
           VITE_AZURE_AD_TENANT_ID: ${{ secrets.VITE_AZURE_AD_TENANT_ID }}
           VITE_AZURE_AD_CLIENT_ID: ${{ secrets.VITE_AZURE_AD_CLIENT_ID }}
           VITE_AZURE_AD_API_SCOPE: ${{ secrets.VITE_AZURE_AD_API_SCOPE }}
