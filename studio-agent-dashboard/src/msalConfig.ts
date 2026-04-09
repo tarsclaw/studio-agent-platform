@@ -1,4 +1,4 @@
-import { PublicClientApplication, type AccountInfo, type AuthenticationResult, BrowserCacheLocation } from '@azure/msal-browser';
+import { PublicClientApplication, type AccountInfo, type AuthenticationResult, BrowserCacheLocation, type RedirectRequest } from '@azure/msal-browser';
 
 const clientId = import.meta.env.VITE_AZURE_AD_CLIENT_ID as string | undefined;
 const tenantId = import.meta.env.VITE_AZURE_AD_TENANT_ID as string | undefined;
@@ -29,6 +29,33 @@ export const msalConfig = msalEnabled
 export const loginRequest = {
   scopes: apiScope ? [apiScope] : ['User.Read'],
 };
+
+const DEFAULT_POST_LOGIN_PATH = '/dashboard/overview';
+
+function getPostLoginPath(): string {
+  if (typeof window === 'undefined') return DEFAULT_POST_LOGIN_PATH;
+  const { pathname, search, hash } = window.location;
+  if (pathname.startsWith('/dashboard')) {
+    return `${pathname}${search}${hash}`;
+  }
+  return DEFAULT_POST_LOGIN_PATH;
+}
+
+function buildLoginRequest(): RedirectRequest {
+  return {
+    ...loginRequest,
+    state: JSON.stringify({ returnTo: getPostLoginPath() }),
+  };
+}
+
+function readPostLoginPath(state?: string | null): string {
+  if (!state) return DEFAULT_POST_LOGIN_PATH;
+  try {
+    const parsed = JSON.parse(state) as { returnTo?: string };
+    if (parsed.returnTo && parsed.returnTo.startsWith('/')) return parsed.returnTo;
+  } catch {}
+  return DEFAULT_POST_LOGIN_PATH;
+}
 
 let app: PublicClientApplication | null = null;
 let initialized = false;
@@ -80,6 +107,11 @@ export async function getMsalApp(): Promise<PublicClientApplication | null> {
     const redirectResult = await app.handleRedirectPromise().catch(() => null);
     if (redirectResult?.account) {
       app.setActiveAccount(redirectResult.account);
+      const returnTo = readPostLoginPath(redirectResult.state);
+      if (typeof window !== 'undefined' && `${window.location.pathname}${window.location.search}${window.location.hash}` !== returnTo) {
+        window.location.replace(returnTo);
+        return app;
+      }
     }
     clearLoginAttempt();
     redirectHandled = true;
@@ -113,7 +145,7 @@ export async function loginWithMsal(): Promise<void> {
   if (redirectInFlight) return;
   markLoginAttempt();
   redirectInFlight = true;
-  await msal.loginRedirect(loginRequest);
+  await msal.loginRedirect(buildLoginRequest());
 }
 
 export async function acquireAccessToken(options?: { interactive?: boolean }): Promise<string | null> {
@@ -140,7 +172,7 @@ export async function acquireAccessToken(options?: { interactive?: boolean }): P
     if (interactive && !redirectInFlight) {
       markLoginAttempt();
       redirectInFlight = true;
-      await msal.acquireTokenRedirect({ ...loginRequest, account });
+      await msal.acquireTokenRedirect({ ...buildLoginRequest(), account });
     }
     return null;
   }
